@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>@yield('title')</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.9.0/css/bootstrap-datepicker3.min.css">
     <link rel="stylesheet" href="{{ asset('css/app.css') }}">
 </head>
 <body>
@@ -15,15 +16,21 @@
                 <span class="navbar-toggler-icon"></span>
             </button>
 
+            <?php 
+                $__activeNav = function($name) {
+                    return strpos(url()->current(), $name) !== false ? 'active' : '';
+                };
+            ?>
+
             <div class="collapse navbar-collapse" id="navbarSupportedContent">
                 <ul class="navbar-nav mr-auto">
-                    <li class="nav-item">
+                    <li class="nav-item <?= $__activeNav('/living') ?>">
                         <a class="nav-link" href="{{ url('living') }}">Living</a>
                     </li>
-                    <li class="nav-item">
+                    <li class="nav-item <?= $__activeNav('/saving') ?>">
                         <a class="nav-link" href="{{ url('saving') }}">Saving</a>
                     </li>
-                    <li class="nav-item">
+                    <li class="nav-item <?= $__activeNav('/playing') ?>">
                         <a class="nav-link" href="{{ url('playing') }}">Playing</a>
                     </li>
                 </ul>
@@ -35,5 +42,6 @@
     </div>
 
     <script src="{{ asset('js/app.js') }}"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.9.0/js/bootstrap-datepicker.min.js"></script>
 </body>
 </html>

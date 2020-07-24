@@ -20,7 +20,7 @@
         <thead>
             <tr>
                 <th>No</th>
-                <th>Month - Year</th>
+                <th>Date Time</th>
                 <th>Target Budget</th>
                 <th>Total Spent</th>
                 <th>Budget Left</th>
@@ -28,86 +28,29 @@
             </tr>
         </thead>
         <tbody>
-            <tr>
-                <td>1</td>
-                <td>June - 2020</td>
-                <td>IDR 3.000.000</td>
-                <td>IDR 2.750.000</td>
-                <td>IDR 250.000</td>
+            <tr v-if="livingData.length > 0" v-for="data in livingData">
+                <td>@{{ data.id }}</td>
+                <td>@{{ data.datetime }}</td>
+                <td>IDR @{{ data.targetBudget }}</td>
+                <td>IDR @{{ data.totalSpent }}</td>
+                <td>IDR @{{ data.budgetLeft }}</td>
                 <td>
                     <div class="btn-group" role="group" aria-label="Basic example">
-                        <button type="button" class="btn btn-sm btn-danger">Pay Bill</button>
+                        <button type="button" class="btn btn-sm btn-danger" v-on:click="handlePayBill">Pay Bill</button>
                         <button type="button" class="btn btn-sm btn btn-outline-success">Details</button>
                         <button type="button" class="btn btn-sm btn-outline-primary">Delete</button>
                     </div>
                 </td>
             </tr>
+            <tr v-if="livingData.length <= 0">
+                <td colspan="6"><p class="text-center">No items</p></td>
+            </tr>
         </tbody>
     </table>
 
-    <!-- Modal -->
-    <div class="modal fade" id="createPlanModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
-        <!-- Vertically centered scrollable modal -->
-        <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="staticBackdropLabel">Create Plan</h5>
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
-                </div>
-                <div class="modal-body">
-                    <div class="container">
-                        <div class="row">
-                            <label>
-                                <input type="radio" value="new" name="plan" v-model="plan">
-                                &nbsp;New
-                            </label>
-                            <label style="margin-left: 10px;">
-                                <input type="radio" value="existing" name="plan" v-model="plan">
-                                &nbsp;Existing
-                            </label>
-                        </div>
-                        <br>
-                        <div class="modal-item" v-if="plan == 'new'">
-                            <div>
-                                <h5>Target Budget</h5>
-                                <div class="form-group">
-                                    <input type="text" class="form-control" placeholder="IDR" v-model="targetBudget">
-                                </div>
-                            </div>
-                            
-                            <div>
-                                <h5>Required Items</h5>
-                                <div class="form-group" v-for="item in requiredItems">
-                                    <label>@{{ item.name }} &nbsp;<a href="javascript:;" v-on:click="handleRemoveItem(item.id)">x</a></label>
-                                    <input type="text" class="form-control" placeholder="IDR" v-model="item.amount">
-                                </div>
-                                <button class="btn btn-danger" v-on:click="handleAddRequiredItem">Add Item</button>
-                            </div>
-                        </div>
+    @include('living._createPlanModal')
 
-                        <div class="modal-item" v-if="plan == 'existing'">
-                            <div>
-                                <h5>Select Month</h5>
-                                <select name="plan" class="form-control">
-                                    <option value="1">June - 2020</option>
-                                    <option value="2">Mei - 2020</option>
-                                    <option value="2">April - 2020</option>
-                                </select>
-                            </div>
-                        </div>
-
-                    </div>
-                </div>
-                <div class="modal-footer">
-                    <p>Total Items: <strong>IDR @{{ calculateRequiredItemTotal }}</strong></p>
-                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                    <button type="button" class="btn btn-primary" v-on:click="handleCreatePlanCreate">Create</button>
-                </div>
-            </div>
-        </div>
-    </div>
+    @include('living._payBillModal')
 
 </div>
 
@@ -115,14 +58,41 @@
     const vueObj = new Vue({
         el: '#app',
         data: {
-            plan: 'new',
-            requiredItems: [
-                {id: 1, name: 'Internet', amount: 0},
-                {id: 2, name: 'Sampah', amount: 0},
-                {id: 3, name: 'Sewa kontrakan', amount: 0},
-                {id: 4, name: 'Galon air', amount: 0},
+            createPlanForm: {
+                plan: 'new',
+                dateTime: '',
+                requiredItems: [
+                    {id: 1, name: 'Internet', amount: 0},
+                    {id: 2, name: 'Sampah', amount: 0},
+                    {id: 3, name: 'Sewa kontrakan', amount: 0},
+                    {id: 4, name: 'Galon air', amount: 0},
+                ],
+                targetBudget: 0,
+            },
+            payBillForm: {
+                regularItems: [
+                    {id: (Math.random() + ''), name: 'Belanja minggu 1', amount: 0},
+                    {id: (Math.random() + ''), name: 'Belanja minggu 2', amount: 0},
+                    {id: (Math.random() + ''), name: 'Beli susu', amount: 0},
+                    {id: (Math.random() + ''), name: 'Beli mecin', amount: 0},
+                ],
+            },
+            livingData: [
+                {
+                    id: 1,
+                    datetime: '2020/07/24 09:18:01',
+                    targetBudget: 3000000,
+                    totalSpent: 2750000,
+                    budgetLeft: 250000,
+                },
+                {
+                    id: 2,
+                    datetime: '2020/06/23 09:18:01',
+                    targetBudget: 3000000,
+                    totalSpent: 2750000,
+                    budgetLeft: 250000,
+                },
             ],
-            targetBudget: 0,
         },
         methods: {
             handleCreatePlan() {
@@ -137,16 +107,16 @@
                         name: name,
                         amount: 0,
                     }
-                    this.requiredItems = [...this.requiredItems, newItem];
+                    this.createPlanForm.requiredItems = [...this.createPlanForm.requiredItems, newItem];
                 }
             },
             handleRemoveItem(id) {
-                this.requiredItems = this.requiredItems.filter(item => item.id != id);
+                this.createPlanForm.requiredItems = this.createPlanForm.requiredItems.filter(item => item.id != id);
             },
             handleCreatePlanCreate() {
                 axios.post('{{ url("api/living/createPlan") }}', {
-                    requiredItems: [...this.requiredItems],
-                    targetBudget: this.targetBudget,
+                    requiredItems: [...this.createPlanForm.requiredItems],
+                    targetBudget: this.createPlanForm.targetBudget,
                 })
                 .then(res => {
                     console.log(res);
@@ -154,17 +124,47 @@
                 .catch(err => {
                     alert(err);
                 });
-            }
+            },
+            handlePayBill() {
+                //request details axios
+
+                // fill modal with data
+
+                // show modal
+
+
+                $('#payBillModal').modal();
+            },
+            handleRemoveRegularItem(id) {
+                this.payBillForm.regularItems = this.payBillForm.regularItems.filter(item => item.id != id);
+            },
+            handleAddRegularItem() {
+                const name = prompt('Item Name');
+
+                if (name.length > 0) {
+                    const newItem = {
+                        id: String(Math.random()),
+                        name: name,
+                        amount: 0,
+                    }
+                    this.payBillForm.regularItems = [...this.payBillForm.regularItems, newItem];
+                }
+            },
         },
         mounted() {
-
+            $('#createPlanDateTime').datepicker({
+                format: "yyyy/mm/dd",
+                autoclose: true,
+                todayHighlight: true,
+                startDate: new Date(),
+            });
         },
         updated() {
 
         },
         computed: {
             calculateRequiredItemTotal() {
-                return this.requiredItems.reduce((accumulator, item) => accumulator + parseFloat(item.amount), 0);
+                return this.createPlanForm.requiredItems.reduce((accumulator, item) => accumulator + parseFloat(item.amount), 0);
             }
         }
     });
