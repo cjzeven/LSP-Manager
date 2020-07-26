@@ -7,6 +7,9 @@
         margin-left: -15px;
         margin-right: -15px;
     }
+    .fileupload-container {
+        width: 350px !important;
+    }
 </style>
 
 <div class="container" id="app">
@@ -36,8 +39,8 @@
                 <td>IDR @{{ data.budgetLeft }}</td>
                 <td>
                     <div class="btn-group" role="group" aria-label="Basic example">
-                        <button type="button" class="btn btn-sm btn-danger" v-on:click="handlePayBill">Pay Bill</button>
-                        <button type="button" class="btn btn-sm btn btn-outline-success">Details</button>
+                        <button type="button" class="btn btn-sm btn-danger" @click="handlePayBill(data.id)">Pay Bill</button>
+                        <button type="button" class="btn btn-sm btn btn-outline-success" @click="handlePlanDetails(data.id)">Details</button>
                         <button type="button" class="btn btn-sm btn-outline-primary">Delete</button>
                     </div>
                 </td>
@@ -52,6 +55,8 @@
 
     @include('living._payBillModal')
 
+    @include('living._planDetailsModal')
+
 </div>
 
 <script type="text/babel">
@@ -62,20 +67,27 @@
                 plan: 'new',
                 dateTime: '',
                 requiredItems: [
-                    {id: 1, name: 'Internet', amount: 0},
-                    {id: 2, name: 'Sampah', amount: 0},
-                    {id: 3, name: 'Sewa kontrakan', amount: 0},
-                    {id: 4, name: 'Galon air', amount: 0},
+                    {id: 1, name: 'Internet', amount: 0, paid: false, receiptPhoto: ''},
+                    {id: 2, name: 'Sampah', amount: 0, paid: false, receiptPhoto: ''},
+                    {id: 3, name: 'Sewa kontrakan', amount: 0, paid: false, receiptPhoto: ''},
+                    {id: 4, name: 'Galon air', amount: 0, paid: false, receiptPhoto: ''},
                 ],
                 targetBudget: 0,
             },
             payBillForm: {
-                regularItems: [
-                    {id: (Math.random() + ''), name: 'Belanja minggu 1', amount: 0},
-                    {id: (Math.random() + ''), name: 'Belanja minggu 2', amount: 0},
-                    {id: (Math.random() + ''), name: 'Beli susu', amount: 0},
-                    {id: (Math.random() + ''), name: 'Beli mecin', amount: 0},
+                requiredItems: [
+                    {id: 1, name: 'Internet', amount: 0, paid: false, receiptPhoto: ''},
+                    {id: 2, name: 'Sampah', amount: 0, paid: false, receiptPhoto: ''},
+                    {id: 3, name: 'Sewa kontrakan', amount: 0, paid: false, receiptPhoto: ''},
+                    {id: 4, name: 'Galon air', amount: 0, paid: false, receiptPhoto: ''},
                 ],
+                regularItems: [
+                    {id: (Math.random() + ''), name: 'Belanja minggu 1', amount: 0, paid: false, receiptPhoto: ''},
+                    {id: (Math.random() + ''), name: 'Belanja minggu 2', amount: 0, paid: false, receiptPhoto: ''},
+                    {id: (Math.random() + ''), name: 'Beli susu', amount: 0, paid: false, receiptPhoto: ''},
+                    {id: (Math.random() + ''), name: 'Beli mecin', amount: 0, paid: false, receiptPhoto: ''},
+                ],
+                targetBudget: 0,
             },
             livingData: [
                 {
@@ -93,6 +105,7 @@
                     budgetLeft: 250000,
                 },
             ],
+            detailsData: [],
         },
         methods: {
             handleCreatePlan() {
@@ -125,14 +138,12 @@
                     alert(err);
                 });
             },
-            handlePayBill() {
-                //request details axios
+            handlePayBill(id) {
+                // TODO: mengambil detail dari plan berdasarkan id
 
-                // fill modal with data
+                // TODO: isi modal dengan data detail
 
-                // show modal
-
-
+                // TODO: tampilkan modal
                 $('#payBillModal').modal();
             },
             handleRemoveRegularItem(id) {
@@ -150,6 +161,52 @@
                     this.payBillForm.regularItems = [...this.payBillForm.regularItems, newItem];
                 }
             },
+            handlePaid(id) {
+                // TODO: send axios to update related item
+
+                // TODO: cari data berdasarkan id tersebut dan disable form inputnya
+                this.payBillForm.requiredItems = this.payBillForm.requiredItems.map(item => {
+                    if (item.id == id) {
+                        item.paid = !item.paid;
+                    }
+                    return item;
+                });
+            },
+            handleUploadReceipt(e, id) {
+                const file = e.target.files[0];
+
+                // TODO: kirim image ke backend
+
+                // TODO: update receiptImage property berdasarkan id
+                this.payBillForm.requiredItems = this.payBillForm.requiredItems.map(item => {
+                    if (item.id == id) {
+                        item.receiptPhoto = file.name;
+                    }
+                    return item;
+                });
+
+            },
+            handlePayBillAddRequiredItem() {
+                const name = prompt('Item Name');
+
+                if (name.length > 0) {
+                    const newItem = {
+                        id: String(Math.random()),
+                        name: name,
+                        amount: 0,
+                    }
+                    this.payBillForm.requiredItems = [...this.payBillForm.requiredItems, newItem];
+                }
+            },
+            handlePlanDetails(id) {
+                // TODO: request plan details berdasarkan id
+
+                // TODO: simpan di detailsData
+                this.detailsData = [];
+
+                // TODO: tampilkan modal plan details
+                $('#planDetailsModal').modal();
+            },
         },
         mounted() {
             $('#createPlanDateTime').datepicker({
@@ -160,7 +217,7 @@
             });
         },
         updated() {
-
+            
         },
         computed: {
             calculateRequiredItemTotal() {

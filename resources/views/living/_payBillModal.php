@@ -11,18 +11,29 @@
             </div>
             <div class="modal-body">
                 <div class="container">
-                    <div class="modal-item" v-if="createPlanForm.plan == 'new'">                        
+                    <div class="modal-item">                        
                         <div>
                             <h5>Required Items</h5>
-                            <div class="form-group" v-for="item in createPlanForm.requiredItems">
+                            <div class="form-group" v-for="item in payBillForm.requiredItems">
                                 <label>{{ item.name }} &nbsp;
                                     <button type="button" class="close" aria-label="Close" v-on:click="handleRemoveItem(item.id)">
                                         <span aria-hidden="true">&times;</span>
                                     </button>
                                 </label>
-                                <input type="text" class="form-control" placeholder="IDR" v-model="item.amount">
+                                <div class="input-group">
+                                    <input type="text" class="form-control" placeholder="IDR" v-model="item.amount" :disabled="item.paid">
+                                    <div class="input-group-append">
+                                        <span class="input-group-text">
+                                            <input type="checkbox" name="paid" @change="handlePaid(item.id)">&nbsp;Paid
+                                        </span>
+                                        <span class="input-group-text fileupload-container">
+                                            <input type="file" name="uploadReceipt" @change="handleUploadReceipt($event, item.id)">&nbsp;&nbsp;
+                                            <a v-if="item.receiptPhoto" :href="item.receiptPhoto" target="_blank">Receipt</a>
+                                        </span>
+                                    </div>
+                                </div>
                             </div>
-                            <button class="btn btn-danger" v-on:click="handleAddRequiredItem">Add Required Item</button>
+                            <button class="btn btn-danger" v-on:click="handlePayBillAddRequiredItem">Add Required Item</button>
                         </div>
                         <br>
                         <hr>
@@ -35,20 +46,21 @@
                                         <span aria-hidden="true">&times;</span>
                                     </button>
                                 </label>
-                                <input type="text" class="form-control" placeholder="IDR" v-model="item.amount">
+                                <div class="input-group">
+                                    <input type="text" class="form-control" placeholder="IDR" v-model="item.amount">
+                                    <div class="input-group-append">
+                                        <span class="input-group-text">
+                                            <input type="checkbox" name="paid" @change="handlePaid(item.id)">&nbsp;Paid
+                                        </span>
+                                        <span class="input-group-text fileupload-container">
+                                            <input type="file" name="uploadReceipt" @change="handleUploadReceipt($event, item.id)">&nbsp;&nbsp;
+                                            <a v-if="item.receiptPhoto" :href="item.receiptPhoto" target="_blank">Receipt</a>
+                                        </span>
+                                    </div>
+                                </div>
+
                             </div>
                             <button class="btn btn-success" v-on:click="handleAddRegularItem">Add Regular Item</button>
-                        </div>
-                    </div>
-
-                    <div class="modal-item" v-if="createPlanForm.plan == 'existing'">
-                        <div>
-                            <h5>Select Month</h5>
-                            <select name="plan" class="form-control">
-                                <option value="1">June - 2020</option>
-                                <option value="2">Mei - 2020</option>
-                                <option value="2">April - 2020</option>
-                            </select>
                         </div>
                     </div>
 
