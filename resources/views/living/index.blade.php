@@ -41,7 +41,7 @@
                     <div class="btn-group" role="group" aria-label="Basic example">
                         <button type="button" class="btn btn-sm btn-danger" @click="handlePayBill(data.id)">Pay Bill</button>
                         <button type="button" class="btn btn-sm btn btn-outline-success" @click="handlePlanDetails(data.id)">Details</button>
-                        <button type="button" class="btn btn-sm btn-outline-primary">Delete</button>
+                        <button type="button" class="btn btn-sm btn-outline-primary" @click="handleDeletePlan(data.id)">Delete</button>
                     </div>
                 </td>
             </tr>
@@ -146,6 +146,9 @@
                 // TODO: tampilkan modal
                 $('#payBillModal').modal();
             },
+            handlePayBillRemoveItem(id) {
+                this.payBillForm.requiredItems = this.payBillForm.requiredItems.filter(item => item.id != id);
+            },
             handleRemoveRegularItem(id) {
                 this.payBillForm.regularItems = this.payBillForm.regularItems.filter(item => item.id != id);
             },
@@ -206,6 +209,11 @@
 
                 // TODO: tampilkan modal plan details
                 $('#planDetailsModal').modal();
+            },
+            handleDeletePlan(id) {
+                if (confirm('Are you sure to DELETE this plan?')) {
+                    this.livingData = this.livingData.filter(item => item.id != id);
+                }
             },
         },
         mounted() {

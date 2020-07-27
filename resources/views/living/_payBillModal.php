@@ -16,7 +16,7 @@
                             <h5>Required Items</h5>
                             <div class="form-group" v-for="item in payBillForm.requiredItems">
                                 <label>{{ item.name }} &nbsp;
-                                    <button type="button" class="close" aria-label="Close" v-on:click="handleRemoveItem(item.id)">
+                                    <button type="button" class="close" aria-label="Close" v-on:click="handlePayBillRemoveItem(item.id)">
                                         <span aria-hidden="true">&times;</span>
                                     </button>
                                 </label>
