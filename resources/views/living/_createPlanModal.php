@@ -22,7 +22,7 @@
                         </label>
                     </div>
                     <br>
-                    <div class="modal-item" v-if="createPlanForm.plan == 'new'">
+                    <div class="modal-item" v-show="createPlanForm.plan == 'new'">
                         <div>
                             <h5>Date</h5>
                             <div class="form-group">
@@ -51,7 +51,7 @@
                         </div>
                     </div>
 
-                    <div class="modal-item" v-if="createPlanForm.plan == 'existing'">
+                    <div class="modal-item" v-show="createPlanForm.plan == 'existing'">
                         <div>
                             <h5>Select Month</h5>
                             <select name="plan" class="form-control">
