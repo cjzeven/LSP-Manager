@@ -120,4 +120,70 @@ class LivingController extends Controller
         $living = LivingItem::where(['living_id' => $id])->get();
         return response()->json($living, 200);
     }
+
+    public function apiPaid($id)
+    {
+        $livingItem = LivingItem::find($id);
+        $livingItem->paid = !(int) $livingItem->paid;
+        $livingItem->save();
+        return response()->json($livingItem, 200);
+    }
+
+    public function apiCreateItem(Request $request, $id)
+    {
+        $name = $request->get('name');
+        $amount = $request->get('amount');
+        $paid = $request->get('paid');
+        $isRequired = $request->get('isRequired');
+        $receiptPhoto = $request->get('receiptPhoto');
+
+        $item = new LivingItem();
+        $item->living_id = $id;
+        $item->name = $name;
+        $item->amount = $amount;
+        $item->paid = $paid;
+        $item->is_required = $isRequired;
+        $item->receipt_photo = $receiptPhoto;
+        $item->save();
+
+        return response()->json($item, 200);
+    }
+
+    public function apiUpdateItem(Request $request, $id)
+    {
+        $name = $request->get('name');
+        $amount = $request->get('amount');
+        $paid = $request->get('paid');
+        $isRequired = $request->get('isRequired');
+        $receiptPhoto = $request->get('receiptPhoto');
+
+        $item = LivingItem::find($id);
+
+        if ($name) {
+            $item->name = $name;
+        }
+        if ($amount) {
+            $item->amount = $amount;
+        }
+        if ($paid) {
+            $item->paid = $paid;
+        }
+        if ($isRequired) {
+            $item->is_required = $isRequired;
+        }
+        if ($receiptPhoto) {
+            $item->receipt_photo = $receiptPhoto;
+        }
+
+        $item->save();
+
+        return response()->json($item, 200);
+        
+    }
+
+    public function apiDeleteItem($id)
+    {
+        $item = LivingItem::destroy($id);
+        return response()->json(['status' => 1], 200);
+    }
 }

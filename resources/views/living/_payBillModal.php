@@ -21,10 +21,10 @@
                                     </button>
                                 </label>
                                 <div class="input-group">
-                                    <input type="text" class="form-control" placeholder="IDR" v-model="item.amount" :disabled="item.paid">
+                                    <input type="text" class="form-control" placeholder="IDR" v-model="item.amount" :disabled="item.paid" @keyup="handlePayBillAmountKeyup($event, item.id)">
                                     <div class="input-group-append">
                                         <span class="input-group-text">
-                                            <input type="checkbox" name="paid" @change="handlePaid(item.id)">&nbsp;Paid
+                                            <input type="checkbox" name="paid" @change="handlePaid(item.id)" :checked="item.paid">&nbsp;Paid
                                         </span>
                                         <span class="input-group-text fileupload-container">
                                             <input type="file" name="uploadReceipt" @change="handleUploadReceipt($event, item.id)">&nbsp;&nbsp;

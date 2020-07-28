@@ -76,6 +76,7 @@
             },
             livingData: [],
             detailsData: [],
+            currentLivingStateId: 0,
         },
         methods: {
             handleCreatePlan() {
@@ -138,21 +139,24 @@
                         }
 
                         this.payBillForm = {regularItems, requiredItems};
+                        this.currentLivingStateId = id;
 
                         $('#payBillModal').modal();
                     }
                 } catch (error) {
                     console.log('ERR handlePayBill', error);
                 }
-
-
-                // TODO: isi modal dengan data detail
-
-                // TODO: tampilkan modal
-                // $('#payBillModal').modal();
             },
-            handlePayBillRemoveItem(id) {
-                this.payBillForm.requiredItems = this.payBillForm.requiredItems.filter(item => item.id != id);
+            async handlePayBillRemoveItem(id) {
+                try {
+                    const item = await axios.get('{{ url("api/living/delete") }}/' + id);
+
+                    if (item.status === 200) {
+                        this.payBillForm.requiredItems = this.payBillForm.requiredItems.filter(item => item.id != id);
+                    }
+                } catch (error) {
+                    console.log('ERR handlePayBillRemoveItem', error);
+                }
             },
             handleRemoveRegularItem(id) {
                 this.payBillForm.regularItems = this.payBillForm.regularItems.filter(item => item.id != id);
@@ -182,16 +186,20 @@
                     return item;
                 });
             },
-            handlePaid(id) {
-                // TODO: send axios to update related item
+            async handlePaid(id) {
+                try {
+                    const livingItem = await axios.post('{{ url("api/living/paid") }}/' + id);
 
-                // TODO: cari data berdasarkan id tersebut dan disable form inputnya
-                this.payBillForm.requiredItems = this.payBillForm.requiredItems.map(item => {
-                    if (item.id == id) {
-                        item.paid = !item.paid;
-                    }
-                    return item;
-                });
+                    this.payBillForm.requiredItems = this.payBillForm.requiredItems.map(item => {
+                        if (item.id == livingItem.data.id) {
+                            item.paid = !item.paid;
+                        }
+                        return item;
+                    });
+                } catch (error) {
+                    console.log('ERR handlePaid', error);
+                }
+
             },
             handleUploadReceipt(e, id) {
                 const file = e.target.files[0];
@@ -207,17 +215,36 @@
                 });
 
             },
-            handlePayBillAddRequiredItem() {
+            async handlePayBillAddRequiredItem() {
                 const name = prompt('Item Name');
 
-                if (name.length > 0) {
-                    const newItem = {
-                        id: String(Math.random()),
+                const id = this.currentLivingStateId;
+
+                try {
+                    const item = await axios.post('{{ url("") }}' + '/api/living/'+ id +'/create', {
                         name: name,
                         amount: 0,
+                        paid: 0,
+                        isRequired: 1,
+                        receiptPhoto: '',
+                    });
+
+                    const newData = {
+                        id: item.data.id,
+                        name: item.data.name,
+                        amount: item.data.amount,
+                        paid: !!item.data.paid,
+                        isRequired: !!item.data.is_required,
+                        receiptPhoto: item.data.receipt_photo,
+                    };
+
+                    if (name.length > 0) {
+                        this.payBillForm.requiredItems = [...this.payBillForm.requiredItems, newData];
                     }
-                    this.payBillForm.requiredItems = [...this.payBillForm.requiredItems, newItem];
+                } catch (error) {
+                    console.log('ERR handlePayBillAddRequiredItem', error);
                 }
+
             },
             handlePlanDetails(id) {
                 // TODO: request plan details berdasarkan id
@@ -233,6 +260,12 @@
                     this.livingData = this.livingData.filter(item => item.id != id);
                 }
             },
+            handlePayBillAmountKeyup: _.debounce(async function(e, id) {
+                await axios.post('{{ url("") }}' + '/api/living/item/' + id, {
+                    amount: e.target.value,
+                });
+
+            }, 1300),
         },
         async mounted() {
             
