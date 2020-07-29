@@ -14,20 +14,38 @@
         display: inline-block;
         width: 100%;
     }
+    .fade-enter, .fade-leave-to {
+        opacity: 0;
+    }
+    .fade-enter-to, .fade-leave {
+        opacity: 1;
+    }
     .fade-enter-active {
         transition: opacity .5s;
     }
-    .fade-enter {
-        opacity: 0;
+    .fade-leave-active {
+        transition: opacity .3s;
     }
-    .test-leave-active {
-        transition: opacity .5s;
+    .slide-fade-enter-active {
+      transition: all .3s ease;
     }
-    /* .test-leave-active {
-        transition: opacity .5s .5s;
-    } */
-    .test-leave {
+    .slide-fade-leave-active {
+      transition: all .3s cubic-bezier(1.0, 0.5, 0.8, 1.0);
+    }
+    .slide-fade-enter, .slide-fade-leave-to {
+      transform: translateX(10px);
+      opacity: 0;
+    }
+    .slide-fadeout-enter {
         opacity: 0;
+        transform: translateX(10px);
+    }
+    .slide-fadeout-enter-to {
+        opacity: 1;
+    }
+    .slide-fadeout-enter-active {
+        transition: all .1s cubic-bezier(1.0, 0.5, 0.8, 1.0);
+        transition-delay: .3s;
     }
 </style>
 
@@ -305,9 +323,17 @@
                 // TODO: tampilkan modal plan details
                 $('#planDetailsModal').modal();
             },
-            handleDeletePlan(id) {
+            async handleDeletePlan(id) {
                 if (confirm('Are you sure to DELETE this plan?')) {
-                    this.livingData = this.livingData.filter(item => item.id != id);
+                    try {
+                        const item = await axios.get('{{ url("") }}' + '/api/living/'+ id +'/delete');
+
+                        if (item.status === 200) {
+                            this.livingData = this.livingData.filter(item => item.id != id);
+                        }
+                    } catch (error) {
+                        console.log('ERR handleDeletePlan', error);
+                    }
                 }
             },
             handlePayBillAmountKeyup: _.debounce(async function(e, id) {

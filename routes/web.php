@@ -25,3 +25,4 @@ Route::post('api/living/paid/{id}', 'LivingController@apiPaid');
 Route::post('api/living/{id}/create', 'LivingController@apiCreateItem');
 Route::post('api/living/item/{id}', 'LivingController@apiUpdateItem');
 Route::get('api/living/delete/{id}', 'LivingController@apiDeleteItem');
+Route::get('api/living/{id}/delete', 'LivingController@apiDestroy');

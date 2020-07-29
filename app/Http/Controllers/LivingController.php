@@ -187,4 +187,10 @@ class LivingController extends Controller
         $item = LivingItem::destroy($id);
         return response()->json(['status' => 1], 200);
     }
+
+    public function apiDestroy($id)
+    {
+        Living::destroy($id);
+        return response()->json(['status' => 1], 200);
+    }
 }

@@ -13,26 +13,33 @@
                 <div class="container">
                     <div class="modal-item">
                         <div>
+                            <h5>Target Budget</h5>
+                            <input type="text" class="form-control" placeholder="IDR" v-model="currentModalData.targetBudget">
+                        </div>
+                        <hr>
+                        <div>
                             <h5>Required Items</h5>
-                            <div class="form-group" v-for="item in payBillForm.requiredItems">
-                                <label>@{{ item.name }} &nbsp;
-                                    <button type="button" class="close" aria-label="Close" v-on:click="handlePayBillRemoveItem(item.id)">
-                                        <span aria-hidden="true">&times;</span>
-                                    </button>
-                                </label>
-                                <div class="input-group">
-                                    <input type="text" class="form-control" placeholder="IDR" v-model="item.amount" :disabled="item.paid" @keyup="handlePayBillAmountKeyup($event, item.id)">
-                                    <div class="input-group-append">
-                                        <span class="input-group-text">
-                                            <input type="checkbox" name="paid" @change="handlePaid(item.id)" :checked="item.paid">&nbsp;Paid
-                                        </span>
-                                        <span class="input-group-text fileupload-container">
-                                            <input type="file" name="uploadReceipt" @change="handleUploadReceipt($event, item.id)">&nbsp;&nbsp;
-                                            <a v-if="item.receiptPhoto" :href="item.receiptPhoto" target="_blank">Receipt</a>
-                                        </span>
+                            <transition-group name="fade" tag="div">
+                                <div class="form-group fade-item" v-for="item in payBillForm.requiredItems" v-bind:key="item.id">
+                                    <label>@{{ item.name }} &nbsp;
+                                        <button type="button" class="close" aria-label="Close" v-on:click="handlePayBillRemoveItem(item.id)">
+                                            <span aria-hidden="true">&times;</span>
+                                        </button>
+                                    </label>
+                                    <div class="input-group">
+                                        <input type="text" class="form-control" placeholder="IDR" v-model="item.amount" :disabled="item.paid" @keyup="handlePayBillAmountKeyup($event, item.id)">
+                                        <div class="input-group-append">
+                                            <span class="input-group-text">
+                                                <input type="checkbox" name="paid" @change="handlePaid(item.id)" :checked="item.paid">&nbsp;Paid
+                                            </span>
+                                            <span class="input-group-text fileupload-container">
+                                                <input type="file" name="uploadReceipt" @change="handleUploadReceipt($event, item.id)">&nbsp;&nbsp;
+                                                <a v-if="item.receiptPhoto" :href="item.receiptPhoto" target="_blank">Receipt</a>
+                                            </span>
+                                        </div>
                                     </div>
                                 </div>
-                            </div>
+                            </transition-group>
                             <button class="btn btn-danger" v-on:click="handlePayBillAddRequiredItem">Add Required Item</button>
                         </div>
                         <br>
@@ -40,26 +47,27 @@
 
                         <div>
                             <h5>Regular Items</h5>
-                            <div class="form-group" v-for="item in payBillForm.regularItems">
-                                <label>@{{ item.name }} &nbsp;
-                                    <button type="button" class="close" aria-label="Close" v-on:click="handleRemoveRegularItem(item.id)">
-                                        <span aria-hidden="true">&times;</span>
-                                    </button>
-                                </label>
-                                <div class="input-group">
-                                    <input type="text" class="form-control" placeholder="IDR" v-model="item.amount" :disabled="item.paid" @keyup="handlePayBillAmountKeyup($event, item.id)">
-                                    <div class="input-group-append">
-                                        <span class="input-group-text">
-                                            <input type="checkbox" name="paid" @change="handlePaidRegularItem(item.id)">&nbsp;Paid
-                                        </span>
-                                        <span class="input-group-text fileupload-container">
-                                            <input type="file" name="uploadReceipt" @change="handleUploadReceipt($event, item.id)">&nbsp;&nbsp;
-                                            <a v-if="item.receiptPhoto" :href="item.receiptPhoto" target="_blank">Receipt</a>
-                                        </span>
+                            <transition-group name="fade" tag="div">
+                                <div class="form-group fade-item" v-for="item in payBillForm.regularItems" v-bind:key="item.id">
+                                    <label>@{{ item.name }} &nbsp;
+                                        <button type="button" class="close" aria-label="Close" v-on:click="handleRemoveRegularItem(item.id)">
+                                            <span aria-hidden="true">&times;</span>
+                                        </button>
+                                    </label>
+                                    <div class="input-group">
+                                        <input type="text" class="form-control" placeholder="IDR" v-model="item.amount" :disabled="item.paid" @keyup="handlePayBillAmountKeyup($event, item.id)">
+                                        <div class="input-group-append">
+                                            <span class="input-group-text">
+                                                <input type="checkbox" name="paid" @change="handlePaidRegularItem(item.id)">&nbsp;Paid
+                                            </span>
+                                            <span class="input-group-text fileupload-container">
+                                                <input type="file" name="uploadReceipt" @change="handleUploadReceipt($event, item.id)">&nbsp;&nbsp;
+                                                <a v-if="item.receiptPhoto" :href="item.receiptPhoto" target="_blank">Receipt</a>
+                                            </span>
+                                        </div>
                                     </div>
                                 </div>
-
-                            </div>
+                            </transition-group>
                             <button class="btn btn-success" v-on:click="handleAddRegularItem">Add Regular Item</button>
                         </div>
                     </div>

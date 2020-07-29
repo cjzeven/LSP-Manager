@@ -22,7 +22,7 @@
                         </label>
                     </div>
                     <br>
-                    <transition name="fade">
+                    <transition name="slide-fade">
                         <div class="modal-item" v-show="createPlanForm.plan == 'new'">
                             <div>
                                 <h5>Date</h5>
@@ -55,7 +55,7 @@
                         </div>
                     </transition>
 
-                    <transition name="test">
+                    <transition name="slide-fadeout">
                         <div class="modal-item" v-show="createPlanForm.plan == 'existing'">
                             <div>
                                 <h5>Select Month</h5>
@@ -66,7 +66,7 @@
                                 </select>
                             </div>
                         </div>
-
+                    </transition>
                 </div>
                 <br>
             </div>
