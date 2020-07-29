@@ -10,6 +10,25 @@
     .fileupload-container {
         width: 350px !important;
     }
+    .fade-item {
+        display: inline-block;
+        width: 100%;
+    }
+    .fade-enter-active {
+        transition: opacity .5s;
+    }
+    .fade-enter {
+        opacity: 0;
+    }
+    .test-leave-active {
+        transition: opacity .5s;
+    }
+    /* .test-leave-active {
+        transition: opacity .5s .5s;
+    } */
+    .test-leave {
+        opacity: 0;
+    }
 </style>
 
 <div class="container" id="app">
@@ -76,7 +95,7 @@
             },
             livingData: [],
             detailsData: [],
-            currentLivingStateId: 0,
+            currentModalData: {},
         },
         methods: {
             handleCreatePlan() {
@@ -85,7 +104,7 @@
             handleAddRequiredItem() {
                 const name = prompt('Item Name');
 
-                if (name.length > 0) {
+                if (name) {
                     const newItem = {
                         id: String(Math.random()),
                         name: name,
@@ -124,7 +143,14 @@
                         const requiredItems = [];
                         const regularItems = [];
 
-                        for (let item of living.data) {
+                        this.currentModalData = {
+                            id: living.data.id,
+                            datetime: living.data.datetime,
+                            targetBudget: living.data.target_budget,
+                            totalSpent: living.data.total_spent,
+                        };
+
+                        for (let item of living.data.items) {
                             if (item.is_required) {
                                 item.receiptPhoto = item.receipt_photo;
                                 delete item.receipt_photo;
@@ -139,7 +165,6 @@
                         }
 
                         this.payBillForm = {regularItems, requiredItems};
-                        this.currentLivingStateId = id;
 
                         $('#payBillModal').modal();
                     }
@@ -158,33 +183,60 @@
                     console.log('ERR handlePayBillRemoveItem', error);
                 }
             },
-            handleRemoveRegularItem(id) {
-                this.payBillForm.regularItems = this.payBillForm.regularItems.filter(item => item.id != id);
-            },
-            handleAddRegularItem() {
-                const name = prompt('Item Name');
+            async handleRemoveRegularItem(id) {
+                // this.payBillForm.regularItems = this.payBillForm.regularItems.filter(item => item.id != id);
+                try {
+                    const item = await axios.get('{{ url("api/living/delete") }}/' + id);
 
-                if (name.length > 0) {
-                    const newItem = {
-                        id: String(Math.random()),
-                        name: name,
-                        amount: 0,
-                        paid: false,
-                        receiptPhoto: '',
+                    if (item.status === 200) {
+                        this.payBillForm.regularItems = this.payBillForm.regularItems.filter(item => item.id != id);
                     }
-                    this.payBillForm.regularItems = [...this.payBillForm.regularItems, newItem];
+                } catch (error) {
+                    console.log('ERR handlePayBillRemoveItem', error);
                 }
             },
-            handlePaidRegularItem(id) {
-                // TODO: send axios to update related item
+            async handleAddRegularItem() {
+                const name = prompt('Item Name');
+                const id = this.currentModalData.id;
 
-                // TODO: cari data berdasarkan id tersebut dan disable form inputnya
-                this.payBillForm.regularItems = this.payBillForm.regularItems.map(item => {
-                    if (item.id == id) {
-                        item.paid = !item.paid;
+                if (name) {
+                    try {
+                        const item = await axios.post('{{ url("") }}' + '/api/living/'+ id +'/create', {
+                            name: name,
+                            amount: 0,
+                            paid: 0,
+                            isRequired: 0,
+                            receiptPhoto: '',
+                        });
+
+                        const newData = {
+                            id: item.data.id,
+                            name: item.data.name,
+                            amount: item.data.amount,
+                            paid: !!item.data.paid,
+                            isRequired: !!item.data.is_required,
+                            receiptPhoto: item.data.receipt_photo,
+                        };
+
+                        this.payBillForm.regularItems = [...this.payBillForm.regularItems, newData];
+                    } catch (error) {
+                        console.log('ERR handleAddRegularItem', error);
                     }
-                    return item;
-                });
+                }
+            },
+            async handlePaidRegularItem(id) {
+                try {
+                    const livingItem = await axios.post('{{ url("api/living/paid") }}/' + id);
+
+                    this.payBillForm.regularItems = this.payBillForm.regularItems.map(item => {
+                        if (item.id == livingItem.data.id) {
+                            item.paid = !item.paid;
+                        }
+                        return item;
+                    });
+                } catch (error) {
+                    console.log('ERR handlePaidRegularItem', error);
+                }
             },
             async handlePaid(id) {
                 try {
@@ -217,34 +269,32 @@
             },
             async handlePayBillAddRequiredItem() {
                 const name = prompt('Item Name');
+                const id = this.currentModalData.id;
 
-                const id = this.currentLivingStateId;
+                if (name) {
+                    try {
+                        const item = await axios.post('{{ url("") }}' + '/api/living/'+ id +'/create', {
+                            name: name,
+                            amount: 0,
+                            paid: 0,
+                            isRequired: 1,
+                            receiptPhoto: '',
+                        });
 
-                try {
-                    const item = await axios.post('{{ url("") }}' + '/api/living/'+ id +'/create', {
-                        name: name,
-                        amount: 0,
-                        paid: 0,
-                        isRequired: 1,
-                        receiptPhoto: '',
-                    });
+                        const newData = {
+                            id: item.data.id,
+                            name: item.data.name,
+                            amount: item.data.amount,
+                            paid: !!item.data.paid,
+                            isRequired: !!item.data.is_required,
+                            receiptPhoto: item.data.receipt_photo,
+                        };
 
-                    const newData = {
-                        id: item.data.id,
-                        name: item.data.name,
-                        amount: item.data.amount,
-                        paid: !!item.data.paid,
-                        isRequired: !!item.data.is_required,
-                        receiptPhoto: item.data.receipt_photo,
-                    };
-
-                    if (name.length > 0) {
                         this.payBillForm.requiredItems = [...this.payBillForm.requiredItems, newData];
+                    } catch (error) {
+                        console.log('ERR handlePayBillAddRequiredItem', error);
                     }
-                } catch (error) {
-                    console.log('ERR handlePayBillAddRequiredItem', error);
                 }
-
             },
             handlePlanDetails(id) {
                 // TODO: request plan details berdasarkan id
@@ -268,7 +318,7 @@
             }, 1300),
         },
         async mounted() {
-            
+
             this.livingData = (await axios.get('api/living/all')).data;
 
             $('#createPlanDateTime').datepicker({
@@ -283,11 +333,19 @@
             });
         },
         updated() {
-            
+
         },
         computed: {
             calculateRequiredItemTotal() {
-                return this.createPlanForm.requiredItems.reduce((accumulator, item) => accumulator + parseFloat(item.amount), 0);
+                return this.createPlanForm.requiredItems.reduce((acc, item) => acc + parseFloat(item.amount), 0);
+            },
+            calculateTotalSpent() {
+                const totalSpentRequiredItems = this.payBillForm.requiredItems.reduce((acc, item) => acc + parseFloat(item.amount), 0);
+                const totalSpentRegularItems = this.payBillForm.regularItems.reduce((acc, item) => acc + parseFloat(item.amount), 0);
+                return totalSpentRequiredItems + totalSpentRegularItems;
+            },
+            calculateBudgetLeft() {
+                return this.currentModalData.targetBudget - this.calculateTotalSpent;
             }
         }
     });

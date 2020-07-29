@@ -117,7 +117,8 @@ class LivingController extends Controller
 
     public function apiFind($id)
     {
-        $living = LivingItem::where(['living_id' => $id])->get();
+        $living = Living::find($id);
+        $living->items;
         return response()->json($living, 200);
     }
 
@@ -178,7 +179,7 @@ class LivingController extends Controller
         $item->save();
 
         return response()->json($item, 200);
-        
+
     }
 
     public function apiDeleteItem($id)
