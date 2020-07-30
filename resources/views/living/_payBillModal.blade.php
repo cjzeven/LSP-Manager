@@ -22,13 +22,13 @@
                             <transition-group name="fade" tag="div">
                                 <div class="form-group fade-item" v-for="item in payBillForm.requiredItems" v-bind:key="item.id">
                                     <label>@{{ item.name }} &nbsp;
-                                        <button type="button" class="close" aria-label="Close" v-on:click="handlePayBillRemoveItem(item.id)">
+                                        <button v-if="!item.paid" type="button" class="close" aria-label="Close" v-on:click="handlePayBillRemoveItem(item.id)">
                                             <span aria-hidden="true">&times;</span>
                                         </button>
                                     </label>
                                     <div class="input-group">
                                         <input type="text" class="form-control" placeholder="IDR" v-model="item.amount" :disabled="item.paid" @keyup="handlePayBillAmountKeyup($event, item.id)">
-                                        <div class="input-group-append">
+                                        <div class="input-group-append append-items">
                                             <span class="input-group-text">
                                                 <input type="checkbox" name="paid" @change="handlePaid(item.id)" :checked="item.paid">&nbsp;Paid
                                             </span>
@@ -50,15 +50,15 @@
                             <transition-group name="fade" tag="div">
                                 <div class="form-group fade-item" v-for="item in payBillForm.regularItems" v-bind:key="item.id">
                                     <label>@{{ item.name }} &nbsp;
-                                        <button type="button" class="close" aria-label="Close" v-on:click="handleRemoveRegularItem(item.id)">
+                                        <button v-if="!item.paid" type="button" class="close" aria-label="Close" v-on:click="handleRemoveRegularItem(item.id)">
                                             <span aria-hidden="true">&times;</span>
                                         </button>
                                     </label>
                                     <div class="input-group">
                                         <input type="text" class="form-control" placeholder="IDR" v-model="item.amount" :disabled="item.paid" @keyup="handlePayBillAmountKeyup($event, item.id)">
-                                        <div class="input-group-append">
+                                        <div class="input-group-append append-items">
                                             <span class="input-group-text">
-                                                <input type="checkbox" name="paid" @change="handlePaidRegularItem(item.id)">&nbsp;Paid
+                                                <input type="checkbox" name="paid" @change="handlePaidRegularItem(item.id)" :checked="item.paid">&nbsp;Paid
                                             </span>
                                             <span class="input-group-text fileupload-container">
                                                 <input type="file" name="uploadReceipt" @change="handleUploadReceipt($event, item.id)">&nbsp;&nbsp;
@@ -76,9 +76,9 @@
                 <br>
             </div>
             <div class="modal-footer">
-                <p class="inline">Target Budget: <strong>IDR @{{ currentModalData.targetBudget }}</strong></p>|
-                <p class="inline">Total Spent: <strong>IDR @{{ calculateTotalSpent }}</strong></p>|
-                <p class="inline">Budget Left: <strong>IDR @{{ calculateBudgetLeft }}</strong></p>
+                <p class="inline">Target Budget: <strong>@{{ _format(currentModalData.targetBudget) }}</strong></p>|
+                <p class="inline">Total Spent: <strong>@{{ _format(calculateTotalSpent) }}</strong></p>|
+                <p class="inline">Budget Left: <strong>@{{ _format(calculateBudgetLeft) }}</strong></p>
                 <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
             </div>
         </div>

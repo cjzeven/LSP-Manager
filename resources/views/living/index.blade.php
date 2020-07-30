@@ -8,7 +8,7 @@
         margin-right: -15px;
     }
     .fileupload-container {
-        width: 350px !important;
+        width: 380px !important;
     }
     .fade-item {
         display: inline-block;
@@ -47,6 +47,9 @@
         transition: all .1s cubic-bezier(1.0, 0.5, 0.8, 1.0);
         transition-delay: .3s;
     }
+    .append-items {
+        height: 37px;
+    }
 </style>
 
 <div class="container" id="app">
@@ -71,9 +74,9 @@
             <tr v-if="livingData.length > 0" v-for="data in livingData">
                 <td>@{{ data.id }}</td>
                 <td>@{{ data.datetime }}</td>
-                <td>IDR @{{ data.target_budget }}</td>
-                <td>IDR @{{ data.total_spent }}</td>
-                <td>IDR @{{ (data.target_budget - data.total_spent) }}</td>
+                <td>@{{ _format(data.target_budget) }}</td>
+                <td>@{{ _format(data.total_spent) }}</td>
+                <td>@{{ _format(data.target_budget - data.total_spent) }}</td>
                 <td>
                     <div class="btn-group" role="group" aria-label="Basic example">
                         <button type="button" class="btn btn-sm btn-danger" @click="handlePayBill(data.id)">Pay Bill</button>
@@ -114,8 +117,13 @@
             livingData: [],
             detailsData: [],
             currentModalData: {},
+            monthToDuplicate: [],
+            selectedMonthToDuplicate: 0,
         },
         methods: {
+            _format(value) {
+                return moneyFormatIDR(value);
+            },
             async getLivingData() {
                 try {
                     const response = (await axios.get('api/living/all'));
@@ -127,7 +135,18 @@
                     console.log('ERR getLivingData', error);
                 }
             },
-            handleCreatePlan() {
+            async handleCreatePlan() {
+                try {
+                    const livingData = await axios.get('{{ url("api/living/all") }}');
+                    const datetimes = livingData.data.map(item => {
+                        return {datetime: item.datetime, id: item.id};
+                    });
+                    this.monthToDuplicate = datetimes;
+                    this.selectedMonthToDuplicate = datetimes[0].id;
+                } catch (error) {
+                    console.log('ERR handleCreatePlan', error);
+                }
+
                 $('#createPlanModal').modal();
             },
             handleAddRequiredItem() {
@@ -156,12 +175,31 @@
                     });
 
                     if (create.status === 200) {
-                        this.livingData = (await axios.get('api/living/all')).data;
+                        await this.getLivingData();
                         $('#createPlanModal').modal('hide');
                     }
                 } catch (error) {
                     console.log('ERR handleCreatePlanCreate', error);
                 }
+            },
+            async handleCreatePlanDuplicateDate() {
+                const datetime = moment(new Date(document.getElementById('existingDataDatetime').value))
+                                .format('YYYY/MM/DD hh:mm:ss');
+                const id = this.selectedMonthToDuplicate;
+
+                try {
+                    const result = await axios.post('{{ url("") }}' + '/api/living/' + id + '/duplicate', {
+                        datetime: datetime,
+                    });
+                    
+                    if (result.status === 200) {
+                        await this.getLivingData();
+                        $('#createPlanModal').modal('hide');
+                    }
+                } catch (error) {
+                    console.log('ERR handleCreatePlanDuplicateDate', error);
+                }
+
             },
             async handlePayBill(id) {
                 // TODO: mengambil detail dari plan berdasarkan id
@@ -368,6 +406,13 @@
                 const date = moment(e.date).format('YYYY/MM/DD hh:mm:ss');
                 this.createPlanForm.dateTime = date;
             });
+
+            $('#existingDataDatetime').datepicker({
+                format: "yyyy/mm/dd",
+                autoclose: true,
+                todayHighlight: true,
+                startDate: new Date(),
+            });
         },
         updated() {
 
@@ -393,18 +438,20 @@
                 handler: _.debounce(function (val) {
                     const targetBudget = val.targetBudget;
                     const id = this.currentModalData.id;
+                    let _this = this;
+
                     axios.post('{{ url("") }}' + '/api/living/' + id + '/update', {
                         targetBudget: targetBudget,
                     })
-                    .then(res => {
-                        this.livingData = this.livingData.map(item => {
+                    .then(function(res) {
+                        _this.livingData = _this.livingData.map(item => {
                             if (item.id == id) {
                                 item.target_budget = targetBudget;
                             }
                             return item;
                         });
                     })
-                    .catch(error => {
+                    .catch(function(error) {
                         console.log('ERR currentModalData:handler', error);
                     });
                 }, 1300),
@@ -414,19 +461,21 @@
                 // Watch total spent from updating
                 // if theres updates, reflect to db too
                 const id = this.currentModalData.id;
+                let _this = this;
+
                 axios.post('{{ url("") }}' + '/api/living/' + id + '/update', {
                     totalSpent: totalSpent,
                 })
-                .then(res => {
-                    this.livingData = this.livingData.map(item => {
+                .then(function(res) {
+                    _this.livingData = _this.livingData.map(item => {
                         if (item.id == id) {
                             item.total_spent = totalSpent;
                         }
                         return item;
                     });
                 })
-                .catch(error => {
-                    console.log('ERR currentModalData:handler', error);
+                .catch(function(error) {
+                    console.log('ERR calculateTotalSpent:handler', error);
                 });
 
             }, 1300),

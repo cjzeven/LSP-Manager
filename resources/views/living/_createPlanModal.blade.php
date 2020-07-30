@@ -22,58 +22,59 @@
                         </label>
                     </div>
                     <br>
-                    <transition name="slide-fade">
-                        <div class="modal-item" v-show="createPlanForm.plan == 'new'">
-                            <div>
-                                <h5>Date</h5>
-                                <div class="form-group">
-                                    <input id="createPlanDateTime" type="text" class="form-control" placeholder="yyyy/mm/dd">
-                                </div>
-                            </div>
-
-                            <div>
-                                <h5>Target Budget</h5>
-                                <div class="form-group">
-                                    <input type="text" class="form-control" placeholder="IDR" v-model="createPlanForm.targetBudget">
-                                </div>
-                            </div>
-
-                            <div>
-                                <h5>Required Items</h5>
-                                <transition-group name="fade" tag="div">
-                                    <div class="form-group fade-item" v-for="item in createPlanForm.requiredItems" v-bind:key="item.id">
-                                        <label>@{{ item.name }} &nbsp;
-                                            <button type="button" class="close" aria-label="Close" v-on:click="handleRemoveItem(item.id)">
-                                                <span aria-hidden="true">&times;</span>
-                                            </button>
-                                        </label>
-                                        <input type="text" class="form-control" placeholder="IDR" v-model="item.amount">
-                                    </div>
-                                </transition-group>
-                                <button class="btn btn-danger" v-on:click="handleAddRequiredItem">Add Item</button>
+                    <div class="modal-item" v-show="createPlanForm.plan == 'new'">
+                        <div>
+                            <h5>Date</h5>
+                            <div class="form-group">
+                                <input id="createPlanDateTime" type="text" class="form-control" placeholder="yyyy/mm/dd">
                             </div>
                         </div>
-                    </transition>
 
-                    <transition name="slide-fadeout">
-                        <div class="modal-item" v-show="createPlanForm.plan == 'existing'">
-                            <div>
-                                <h5>Select Month</h5>
-                                <select name="plan" class="form-control">
-                                    <option value="1">June - 2020</option>
-                                    <option value="2">Mei - 2020</option>
-                                    <option value="2">April - 2020</option>
-                                </select>
+                        <div>
+                            <h5>Target Budget</h5>
+                            <div class="form-group">
+                                <input type="text" class="form-control" placeholder="IDR" v-model="createPlanForm.targetBudget">
                             </div>
                         </div>
-                    </transition>
+
+                        <div>
+                            <h5>Required Items</h5>
+                            <transition-group name="fade" tag="div">
+                                <div class="form-group fade-item" v-for="item in createPlanForm.requiredItems" v-bind:key="item.id">
+                                    <label>@{{ item.name }} &nbsp;
+                                        <button type="button" class="close" aria-label="Close" v-on:click="handleRemoveItem(item.id)">
+                                            <span aria-hidden="true">&times;</span>
+                                        </button>
+                                    </label>
+                                    <input type="text" class="form-control" placeholder="IDR" v-model="item.amount">
+                                </div>
+                            </transition-group>
+                            <button class="btn btn-danger" v-on:click="handleAddRequiredItem">Add Item</button>
+                        </div>
+                    </div>
+
+                    <div class="modal-item" v-show="createPlanForm.plan == 'existing'">
+                        <div>
+                            <h5>Date</h5>
+                            <div class="form-group">
+                                <input id="existingDataDatetime" type="text" class="form-control" placeholder="yyyy/mm/dd">
+                            </div>
+                        </div>
+                        <div>
+                            <h5>Select Date to Duplicate</h5>
+                            <select name="plan" class="form-control" v-model="selectedMonthToDuplicate">
+                                <option v-for="month in monthToDuplicate" :value="month.id">@{{ month.datetime }}</option>
+                            </select>
+                        </div>
+                    </div>
                 </div>
                 <br>
             </div>
             <div class="modal-footer">
-                <p>Total Items: <strong>IDR @{{ calculateRequiredItemTotal }}</strong></p>
+                <p v-if="createPlanForm.plan == 'new'">Total Items: <strong>@{{ _format(calculateRequiredItemTotal) }}</strong></p>
                 <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                <button type="button" class="btn btn-primary" v-on:click="handleCreatePlanCreate">Create</button>
+                <button type="button" class="btn btn-primary" v-if="createPlanForm.plan == 'new'" @click="handleCreatePlanCreate">Create</button>
+                <button type="button" class="btn btn-primary" v-if="createPlanForm.plan == 'existing'" @click="handleCreatePlanDuplicateDate">Duplicate</button>
             </div>
         </div>
     </div>

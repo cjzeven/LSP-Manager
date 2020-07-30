@@ -96,9 +96,16 @@ class LivingController extends Controller
         $requiredItems = $request->get('requiredItems');
         $targetBudget = $request->get('targetBudget');
 
+        $totalSpentRequiredItems = 0;
+
+        foreach ($requiredItems as $item) {
+            $totalSpentRequiredItems += $item['amount'];
+        }
+
         $living = new Living();
         $living->datetime = $datetime;
         $living->target_budget = $targetBudget;
+        $living->total_spent = $totalSpentRequiredItems;
         $living->save();
 
         foreach ($requiredItems as $item) {
@@ -212,5 +219,39 @@ class LivingController extends Controller
         $living->save();
 
         return response()->json($living, 200);
+    }
+
+    public function apiDuplicate(Request $request, $id)
+    {
+        $datetime = $request->get('datetime');
+
+        $living = Living::find($id);
+        $items = LivingItem::where(['living_id' => $id, 'is_required' => 1])->get();
+
+        $totalSpentRequiredItems = 0;
+        
+        foreach ($items as $item) {
+            $totalSpentRequiredItems += $item->amount;
+        }
+
+        $newLiving = new Living();
+        $newLiving->datetime = $datetime;
+        $newLiving->target_budget = $living->target_budget;
+        $newLiving->total_spent = $totalSpentRequiredItems;
+        $newLiving->save();
+
+        foreach ($items as $item) {
+            $livingItem = new LivingItem();
+            $livingItem->living_id = $newLiving->id;
+            $livingItem->name = $item->name;
+            $livingItem->amount = $item->amount;
+            $livingItem->is_required = $item->is_required;
+            $livingItem->save();
+        }
+
+        $data = Living::find($id);
+        $data->items;
+
+        return response()->json($data, 200);
     }
 }
