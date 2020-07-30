@@ -21,6 +21,7 @@ Route::get('playing', 'PlayingController@index');
 Route::get('api/living/all', 'LivingController@apiAll');
 Route::post('api/living/create', 'LivingController@apiCreate');
 Route::get('api/living/{id}', 'LivingController@apiFind');
+Route::post('api/living/{id}/update', 'LivingController@apiUpdate');
 Route::post('api/living/paid/{id}', 'LivingController@apiPaid');
 Route::post('api/living/{id}/create', 'LivingController@apiCreateItem');
 Route::post('api/living/item/{id}', 'LivingController@apiUpdateItem');

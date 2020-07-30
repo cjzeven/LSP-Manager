@@ -116,6 +116,17 @@
             currentModalData: {},
         },
         methods: {
+            async getLivingData() {
+                try {
+                    const response = (await axios.get('api/living/all'));
+
+                    if (response.status === 200) {
+                        this.livingData = response.data;
+                    }
+                } catch (error) {
+                    console.log('ERR getLivingData', error);
+                }
+            },
             handleCreatePlan() {
                 $('#createPlanModal').modal();
             },
@@ -345,7 +356,7 @@
         },
         async mounted() {
 
-            this.livingData = (await axios.get('api/living/all')).data;
+            await this.getLivingData();
 
             $('#createPlanDateTime').datepicker({
                 format: "yyyy/mm/dd",
@@ -368,11 +379,57 @@
             calculateTotalSpent() {
                 const totalSpentRequiredItems = this.payBillForm.requiredItems.reduce((acc, item) => acc + parseFloat(item.amount), 0);
                 const totalSpentRegularItems = this.payBillForm.regularItems.reduce((acc, item) => acc + parseFloat(item.amount), 0);
-                return totalSpentRequiredItems + totalSpentRegularItems;
+                const totalSpent = totalSpentRequiredItems + totalSpentRegularItems;
+                return totalSpent;
             },
             calculateBudgetLeft() {
                 return this.currentModalData.targetBudget - this.calculateTotalSpent;
             }
+        },
+        watch: {
+            // Watch target budget from updating
+            // if theres updates, reflect to db too
+            currentModalData: {
+                handler: _.debounce(function (val) {
+                    const targetBudget = val.targetBudget;
+                    const id = this.currentModalData.id;
+                    axios.post('{{ url("") }}' + '/api/living/' + id + '/update', {
+                        targetBudget: targetBudget,
+                    })
+                    .then(res => {
+                        this.livingData = this.livingData.map(item => {
+                            if (item.id == id) {
+                                item.target_budget = targetBudget;
+                            }
+                            return item;
+                        });
+                    })
+                    .catch(error => {
+                        console.log('ERR currentModalData:handler', error);
+                    });
+                }, 1300),
+                deep: true,
+            },
+            calculateTotalSpent: _.debounce(function(totalSpent) {
+                // Watch total spent from updating
+                // if theres updates, reflect to db too
+                const id = this.currentModalData.id;
+                axios.post('{{ url("") }}' + '/api/living/' + id + '/update', {
+                    totalSpent: totalSpent,
+                })
+                .then(res => {
+                    this.livingData = this.livingData.map(item => {
+                        if (item.id == id) {
+                            item.total_spent = totalSpent;
+                        }
+                        return item;
+                    });
+                })
+                .catch(error => {
+                    console.log('ERR currentModalData:handler', error);
+                });
+
+            }, 1300),
         }
     });
 </script>

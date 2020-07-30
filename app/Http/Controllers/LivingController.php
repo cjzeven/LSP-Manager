@@ -193,4 +193,24 @@ class LivingController extends Controller
         Living::destroy($id);
         return response()->json(['status' => 1], 200);
     }
+
+    public function apiUpdate(Request $request, $id)
+    {
+        $living = Living::find($id);
+        
+        $targetBudget = $request->get('targetBudget');
+        $totalSpent = $request->get('totalSpent');
+
+        if ($targetBudget) {
+            $living->target_budget = $targetBudget;
+        }
+
+        if ($totalSpent) {
+            $living->total_spent = $totalSpent;
+        }
+
+        $living->save();
+
+        return response()->json($living, 200);
+    }
 }
