@@ -115,7 +115,13 @@
                 targetBudget: 0,
             },
             livingData: [],
-            detailsData: [],
+            detailsData: {
+                requiredItems: [],
+                regularItems: [],
+                summary: {},
+                datetime: '',
+                id: 0,
+            },
             currentModalData: {},
             monthToDuplicate: [],
             selectedMonthToDuplicate: 0,
@@ -385,14 +391,34 @@
                     }
                 }
             },
-            handlePlanDetails(id) {
-                // TODO: request plan details berdasarkan id
+            async handlePlanDetails(id) {
+                try {
+                    // request plan details berdasarkan id
+                    const details = await axios.get('{{ url("api/living") }}/' + id);
 
-                // TODO: simpan di detailsData
-                this.detailsData = [];
+                    if (details.status === 200) {
+                        const paidItems = details.data.items.filter(item => item.paid === 1);
+                        const requiredItems = paidItems.filter(item => item.is_required === 1);
+                        const regularItems = paidItems.filter(item => item.is_required === 0);
+                        const summary = paidItems.reduce((acc, item) => acc + item.amount, 0);
+                        const datetime = details.data.datetime;
 
-                // TODO: tampilkan modal plan details
-                $('#planDetailsModal').modal();
+                        // simpan di detailsData
+                        this.detailsData = {
+                            requiredItems,
+                            regularItems,
+                            summary,
+                            datetime,
+                            id,
+                        };
+
+                        // tampilkan modal plan details
+                        $('#planDetailsModal').modal();
+                    }
+                    
+                } catch (error) {
+                    console.log('ERR: handlePlanDetails', error);
+                }
             },
             async handleDeletePlan(id) {
                 if (confirm('Are you sure to DELETE this plan?')) {
@@ -406,6 +432,9 @@
                         console.log('ERR handleDeletePlan', error);
                     }
                 }
+            },
+            handleGeneratePDF(id) {
+                alert('Soon: ' + id);
             },
             handlePayBillAmountKeyup: _.debounce(async function(e, id) {
                 await axios.post('{{ url("") }}' + '/api/living/item/' + id, {
