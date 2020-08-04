@@ -28,3 +28,5 @@ Route::post('api/living/item/{id}', 'LivingController@apiUpdateItem');
 Route::get('api/living/delete/{id}', 'LivingController@apiDeleteItem');
 Route::get('api/living/{id}/delete', 'LivingController@apiDestroy');
 Route::post('api/living/{id}/duplicate', 'LivingController@apiDuplicate');
+
+Route::post('api/upload/{category}', 'HomeController@apiUploadFile');

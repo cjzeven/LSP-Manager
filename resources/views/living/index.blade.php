@@ -320,18 +320,40 @@
                 }
 
             },
-            handleUploadReceipt(e, id) {
+            async handleUploadReceipt(e, id) {
                 const file = e.target.files[0];
 
-                // TODO: kirim image ke backend
+                // kirim image ke backend
+                const formData = new FormData();
+                formData.append('file', file);
 
-                // TODO: update receiptImage property berdasarkan id
-                this.payBillForm.requiredItems = this.payBillForm.requiredItems.map(item => {
-                    if (item.id == id) {
-                        item.receiptPhoto = file.name;
+                try {
+                    const res = await axios.post('{{ url("api/upload") }}' + '/living', formData);
+
+                    if (res.status === 200) {
+
+                        try {
+                            // update receipt photo ke database
+                            const update = await axios.post('{{ url("api/living/item") }}/' + id, {
+                                receiptPhoto: res.data.image,
+                            });
+
+                            if (update.status === 200) {
+                                // update receiptImage property berdasarkan id
+                                this.payBillForm.requiredItems = this.payBillForm.requiredItems.map(item => {
+                                    if (item.id == id) {
+                                        item.receiptPhoto = res.data.image;
+                                    }
+                                    return item;
+                                });
+                            }
+                        } catch (error) {
+                            console.log('ERR handleUploadReceipt:update', error);
+                        }
                     }
-                    return item;
-                });
+                } catch (error) {
+                    console.log('ERR handleUploadReceipt:upload', error);
+                }
 
             },
             async handlePayBillAddRequiredItem() {

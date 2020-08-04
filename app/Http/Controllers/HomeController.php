@@ -81,4 +81,21 @@ class HomeController extends Controller
     {
         //
     }
+
+    public function apiUploadFile(Request $request, $category = '')
+    {
+        $filename = strtotime('now') .'-'. mt_rand();
+        $ext = $request->file('file')->extension();
+
+        if (!empty($category)) {
+            $filename = "$category-$filename";
+        }
+
+        $path = $request->file('file')->storeAs(
+            'images', $filename . '.' . $ext
+        );
+
+        return response()->json(['status' => 1, 'image' => asset($path)]);
+
+    }
 }
