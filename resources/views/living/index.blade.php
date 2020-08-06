@@ -54,7 +54,7 @@
 
 <div class="container" id="app">
     <div>
-        <button class="btn btn-success btn-sm" v-on:click="handleCreatePlan">Create Plan</button>
+        <button class="btn btn-success btn-sm" v-on:click="handleCreatePlan">Create Living Plan</button>
     </div>
 
     <br>

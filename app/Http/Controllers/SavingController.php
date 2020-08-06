@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Saving;
+use App\SavingItem;
 use Illuminate\Http\Request;
 
 class SavingController extends Controller
@@ -80,5 +82,30 @@ class SavingController extends Controller
     public function destroy($id)
     {
         //
+    }
+
+    public function apiCreate(Request $request)
+    {
+        $saving = Saving::create($request->all());
+        return response()->json($saving, 200);
+    }
+
+    public function apiAll()
+    {
+        $savings = Saving::with('items')->get();
+        return response()->json($savings, 200);
+    }
+
+    public function apiFind($id)
+    {
+        $saving = Saving::find($id);
+        $saving->items;
+        return response()->json($saving, 200);
+    }
+
+    public function apiCreateItem(Request $request, $id)
+    {
+        $items = SavingItem::create($request->all());
+        return response()->json($items, 200);
     }
 }

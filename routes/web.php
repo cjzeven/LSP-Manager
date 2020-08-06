@@ -29,4 +29,9 @@ Route::get('api/living/delete/{id}', 'LivingController@apiDeleteItem');
 Route::get('api/living/{id}/delete', 'LivingController@apiDestroy');
 Route::post('api/living/{id}/duplicate', 'LivingController@apiDuplicate');
 
+Route::post('api/saving/create', 'SavingController@apiCreate');
+Route::get('api/savings', 'SavingController@apiAll');
+Route::get('api/saving/{id}', 'SavingController@apiFind');
+Route::post('api/saving/{id}/create', 'SavingController@apiCreateItem');
+
 Route::post('api/upload/{category}', 'HomeController@apiUploadFile');

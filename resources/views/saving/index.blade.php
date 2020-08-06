@@ -24,23 +24,27 @@
         <thead>
             <tr>
                 <th>No</th>
-                <th>Date Time</th>
-                <th>Target Budget</th>
-                <th>Total Spent</th>
-                <th>Budget Left</th>
+                <th>Type</th>
+                <th>Name</th>
+                <th>Year</th>
+                <th>Target</th>
+                <th>Total Saving</th>
+                <th>Target Left</th>
                 <th>Options</th>
             </tr>
         </thead>
         <tbody>
-            <tr>
-                <td>1</td>
-                <td>111</td>
-                <td>111</td>
-                <td>333</td>
-                <td>444</td>
+            <tr v-for="item in savings">
+                <td>@{{ item.id }}</td>
+                <td>@{{ item.type == 1 ? 'Bank' : 'Reksadana' }}</td>
+                <td>@{{ item.name }}</td>
+                <td>@{{ item.years }}</td>
+                <td>@{{ _format(item.target) }}</td>
+                <td>@{{ _format(item.total) }}</td>
+                <td>@{{ _format(item.targetLeft) }}</td>
                 <td>
                     <div class="btn-group" role="group" aria-label="Basic example">
-                        <button type="button" class="btn btn-sm btn-danger" @click="handlePayBill()">Pay Bill</button>
+                        <button type="button" class="btn btn-sm btn-danger" @click="handlePayBill(item.id)">Pay Bill</button>
                         <button type="button" class="btn btn-sm btn btn-outline-success" @click="handlePlanDetails()">Details</button>
                         <button type="button" class="btn btn-sm btn-outline-primary" @click="handleDeletePlan()">Delete</button>
                     </div>
@@ -59,20 +63,91 @@
     new Vue({
         el: '#app',
         data: {
-            
+            createPlanForm: {
+                name: '',
+                years: 1,
+                target: 0,
+                type: 1,
+            },
+            paybillData: {
+                form: {
+                    saving_id: 0,
+                    amount: 0,
+                    datetime: '',
+                    receipt_photo: '',
+                },
+                living: {},
+                items: [],
+            },
+            savings: [],
         },
         methods: {
+            _format(value) {
+                return moneyFormatIDR(value);
+            },
+            async getSavings() {
+                try {
+                    const response = await axios.get('{{ url("api/savings") }}');
+
+                    if (response.status === 200) {
+                        this.savings = response.data.map(saving => {
+                            saving.total = saving.items.reduce((acc, item) => acc + item.amount, 0);
+                            saving.targetLeft = saving.target - saving.total;
+                            return saving;
+                        })
+                    }
+                } catch (error) {
+                    console.log('ERR getSavings', error);
+                }
+            },
+            async getSavingItems(id) {
+                try {
+                    const response = await axios.get('{{ url("api/saving") }}/' + id);
+                    
+                    if (response.status === 200) {
+                        this.paybillData.items = response.data.items;
+                        this.paybillData.living = {
+                            name: response.data.name,
+                            id: response.data.id,
+                        };
+                    }
+
+                } catch (error) {
+                    console.log('ERR handlePayBill', error);
+                }
+            },
             handleCreatePlan() {
                 $('#createPlanModal').modal();
             },
-            doCreatePlan() {
+            async doCreatePlan() {
+                try {
+                    const response = await axios.post('{{ url("api/saving/create") }}', this.createPlanForm);
 
+                    if (response.status === 200) {
+                        this.getSavings();
+
+                        $('#createPlanModal').modal('hide');
+                    }
+                } catch (error) {
+                    console.log('ERR doCreatePlan', error);
+                }
             },
-            handlePayBill() {
+            async handlePayBill(id) {
+                await this.getSavingItems(id);
                 $('#payBillModal').modal();
             },
-            doHandlePayment() {
-                
+            async doHandlePayment(id) {
+                try {
+                    this.paybillData.form.saving_id = id;
+
+                    const response = await axios.post('{{ url("api/saving") }}/' + id + '/create', this.paybillData.form);
+
+                    if (response.status === 200) {
+                        this.getSavingItems(id);
+                    }
+                } catch (error) {
+                    
+                }
             },
             handlePlanDetails() {
                 $('#planDetailsModal').modal();
@@ -82,6 +157,9 @@
             }
         },
         mounted() {
+            this.getSavings();
+        },
+        computed: {
 
         }
     });

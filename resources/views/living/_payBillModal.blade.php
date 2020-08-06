@@ -40,7 +40,7 @@
                                     </div>
                                 </div>
                             </transition-group>
-                            <button class="btn btn-danger" v-on:click="handlePayBillAddRequiredItem">Add Required Item</button>
+                            <button class="btn btn-danger btn-sm" v-on:click="handlePayBillAddRequiredItem">Add Required Item</button>
                         </div>
                         <br>
                         <hr>
@@ -68,7 +68,7 @@
                                     </div>
                                 </div>
                             </transition-group>
-                            <button class="btn btn-success" v-on:click="handleAddRegularItem">Add Regular Item</button>
+                            <button class="btn btn-success btn-sm" v-on:click="handleAddRegularItem">Add Regular Item</button>
                         </div>
                     </div>
 

@@ -16,14 +16,14 @@
                         <div>
                             <h5>Name</h5>
                             <div class="form-group">
-                                <input type="text" class="form-control" placeholder="Name">
+                                <input type="text" class="form-control" placeholder="Name" v-model="createPlanForm.name">
                             </div>
                         </div>
 
                         <div>
                             <h5>Year(s)</h5>
                             <div class="form-group">
-                                <select name="years" class="form-control">
+                                <select name="years" class="form-control" v-model="createPlanForm.years">
                                     @foreach(range(1,30) as $year)
                                         <option value="{{ $year }}">{{ $year }}</option>
                                     @endforeach
@@ -34,14 +34,14 @@
                         <div>
                             <h5>Target Budget</h5>
                             <div class="form-group">
-                                <input type="text" class="form-control" placeholder="IDR">
+                                <input type="text" class="form-control" placeholder="IDR" v-model="createPlanForm.target">
                             </div>
                         </div>
 
                         <div>
                             <h5>Type</h5>
                             <div class="form-group">
-                                <select name="type" class="form-control">
+                                <select name="type" class="form-control" v-model="createPlanForm.type">
                                     <option value="1">Bank</option>
                                     <option value="2">Reksadana</option>
                                 </select>

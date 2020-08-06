@@ -49,7 +49,7 @@
                                     <input type="text" class="form-control" placeholder="IDR" v-model="item.amount">
                                 </div>
                             </transition-group>
-                            <button class="btn btn-danger" v-on:click="handleAddRequiredItem">Add Item</button>
+                            <button class="btn btn-danger btn-sm" v-on:click="handleAddRequiredItem">Add Item</button>
                         </div>
                     </div>
 
