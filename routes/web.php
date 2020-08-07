@@ -33,5 +33,6 @@ Route::post('api/saving/create', 'SavingController@apiCreate');
 Route::get('api/savings', 'SavingController@apiAll');
 Route::get('api/saving/{id}', 'SavingController@apiFind');
 Route::post('api/saving/{id}/create', 'SavingController@apiCreateItem');
+Route::post('api/saving/delete/{id}', 'SavingController@apiDeleteItem');
 
 Route::post('api/upload/{category}', 'HomeController@apiUploadFile');

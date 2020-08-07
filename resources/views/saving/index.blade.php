@@ -133,16 +133,26 @@
                 }
             },
             async handlePayBill(id) {
+                this.paybillData.form.saving_id = id;
                 await this.getSavingItems(id);
                 $('#payBillModal').modal();
             },
             async doHandlePayment(id) {
-                try {
-                    this.paybillData.form.saving_id = id;
+                const file = document.getElementById('addPaymentUpload').files[0];
+                let formData = new FormData();
+                formData.append('file', file);
 
-                    const response = await axios.post('{{ url("api/saving") }}/' + id + '/create', this.paybillData.form);
+                const {amount, datetime, saving_id} = this.paybillData.form;
+
+                formData.append('amount', amount);
+                formData.append('datetime', datetime);
+                formData.append('saving_id', saving_id);
+
+                try {
+                    const response = await axios.post('{{ url("api/saving") }}/' + id + '/create', formData);
 
                     if (response.status === 200) {
+                        this.getSavings();
                         this.getSavingItems(id);
                     }
                 } catch (error) {
@@ -154,10 +164,36 @@
             },
             handleDeletePlan() {
 
-            }
+            },
+            async handleRemovePayment(id) {
+                try {
+                    // remove payment history
+                    const response = await axios.post('{{ url("api/saving/delete") }}/' + id);
+                    
+                    if (response.status === 200) {
+                        this.getSavings();
+                        this.getSavingItems(this.paybillData.form.saving_id);
+                    }
+
+                } catch (error) {
+                    console.log('ERR handleRemovePayment', error);
+                }
+            },
+
         },
         mounted() {
             this.getSavings();
+
+            $('#add-payment-date').datepicker({
+                format: "yyyy/mm/dd",
+                autoclose: true,
+                todayHighlight: true,
+                startDate: new Date(),
+            })
+            .on('changeDate', e => {
+                const date = moment(e.date).format('YYYY/MM/DD hh:mm:ss');
+                this.paybillData.form.datetime = date;
+            });
         },
         computed: {
 

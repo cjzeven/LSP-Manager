@@ -17,7 +17,7 @@
                                 <h5>Payment History</h5>
                                 <table class="table">
                                     <thead>
-                                        <th>No</th>
+                                        <th>ID</th>
                                         <th>DateTime</th>
                                         <th>Amount</th>
                                         <th>Receipt Photo</th>
@@ -27,13 +27,17 @@
                                         <tr v-for="item in paybillData.items">
                                             <td>@{{ item.id }}</td>
                                             <td>@{{ item.datetime }}</td>
-                                            <td>@{{ item.amount }}</td>
+                                            <td>@{{ _format(item.amount) }}</td>
                                             <td>
-                                                <a v-if="item.receipt_photo" :href="item.receipt_photo">Receipt</a>
+                                                <a v-if="item.receipt_photo" :href="item.receipt_photo" target="_blank">Receipt</a>
                                                 <a v-else>-</a>
                                             </td>
                                             <td>
-                                                xxx
+                                                <div class="form-group">
+                                                    <button class="btn btn-outline-danger btn-sm" @click="handleRemovePayment(item.id)">
+                                                        Delete
+                                                    </button>
+                                                </div>
                                             </td>
                                         </tr>
                                         <tr v-if="paybillData.items.length <= 0">
@@ -52,10 +56,10 @@
                                     <div class="form-group">
                                         <div class="input-group">
                                             <input type="text" class="form-control" placeholder="IDR" v-model="paybillData.form.amount">
-                                            <input type="text" aria-label="Date" class="form-control" placeholder="Date" v-model="paybillData.form.datetime">
+                                            <input type="text" aria-label="Date" class="form-control" placeholder="Date" v-model="paybillData.form.datetime" id="add-payment-date">
                                             <div class="input-group-append append-items">
                                                 <span class="input-group-text fileupload-container">
-                                                    <input type="file" name="uploadReceipt">&nbsp;&nbsp;
+                                                    <input type="file" name="uploadReceipt" id="addPaymentUpload">&nbsp;&nbsp;
                                                 </span>
                                             </div>
                                         </div>
