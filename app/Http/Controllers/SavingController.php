@@ -125,4 +125,10 @@ class SavingController extends Controller
         SavingItem::destroy($id);
         return response()->json(['status' => 1], 200);
     }
+
+    public function apiDestroy($id)
+    {
+        Saving::destroy($id);
+        return response()->json(['status' => 1], 200);
+    }
 }

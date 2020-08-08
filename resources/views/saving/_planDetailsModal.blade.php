@@ -4,7 +4,7 @@
     <div class="modal-dialog modal-lg modal-dialog-scrollable">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title" id="staticBackdropLabel">Details: xxxxxxx</h5>
+                <h5 class="modal-title" id="staticBackdropLabel">Details: @{{ detailsData.name }}</h5>
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                     <span aria-hidden="true">&times;</span>
                 </button>
@@ -16,20 +16,20 @@
                         <ul class="list-group list-group-flush">
                             <li class="list-group-item">
                                 <div class="row">
-                                    <div class="col-sm">Time Left</div>
-                                    <div class="col-sm">00000</div>
+                                    <div class="col-sm">Type</div>
+                                    <div class="col-sm">@{{ detailsData.type == 1 ? 'Bank' : 'Reksadana' }}</div>
                                 </div>
                                 <div class="row">
                                     <div class="col-sm">Total Saving</div>
-                                    <div class="col-sm">00000</div>
+                                    <div class="col-sm">@{{ _format(detailsData.totalSaving) }}</div>
                                 </div>
                                 <div class="row">
                                     <div class="col-sm">Total Target</div>
-                                    <div class="col-sm">00000</div>
+                                    <div class="col-sm">@{{ _format(detailsData.totalTarget) }}</div>
                                 </div>
                                 <div class="row">
                                     <div class="col-sm">Total Left</div>
-                                    <div class="col-sm">00000</div>
+                                    <div class="col-sm">@{{ _format(detailsData.totalLeft) }}</div>
                                 </div>
                             </li>
                         </ul>

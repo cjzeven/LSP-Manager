@@ -45,8 +45,8 @@
                 <td>
                     <div class="btn-group" role="group" aria-label="Basic example">
                         <button type="button" class="btn btn-sm btn-danger" @click="handlePayBill(item.id)">Pay Bill</button>
-                        <button type="button" class="btn btn-sm btn btn-outline-success" @click="handlePlanDetails()">Details</button>
-                        <button type="button" class="btn btn-sm btn-outline-primary" @click="handleDeletePlan()">Delete</button>
+                        <button type="button" class="btn btn-sm btn btn-outline-success" @click="handlePlanDetails(item.id)">Details</button>
+                        <button type="button" class="btn btn-sm btn-outline-primary" @click="handleDeletePlan(item.id)">Delete</button>
                     </div>
                 </td>
             </tr>
@@ -80,6 +80,14 @@
                 items: [],
             },
             savings: [],
+            detailsData: {
+                id: 0,
+                name: '',
+                type: '',
+                totalSaving: 0,
+                totalTarget: 0,
+                totalLeft: 0,
+            },
         },
         methods: {
             _format(value) {
@@ -164,11 +172,39 @@
                     
                 }
             },
-            handlePlanDetails() {
+            async handlePlanDetails(id) {
+                try {
+                    const response = await axios.get('{{ url("api/saving") }}/' + id);
+
+                    if (response.status === 200) {
+                        const {items, target, type, id, name} = response.data;
+                        const totalSaving = items.reduce((acc, item) => acc + item.amount, 0);
+                        
+                        this.detailsData = {
+                            id: id,
+                            name: name,
+                            type: type,
+                            totalSaving: totalSaving,
+                            totalTarget: target,
+                            totalLeft: target - totalSaving,
+                        };
+                    }
+                } catch (error) {
+                    console.log('ERR handlePlanDetails');
+                }
                 $('#planDetailsModal').modal();
             },
-            handleDeletePlan() {
+            async handleDeletePlan(id) {
+                try {
+                    const response = await axios.get('{{ url("api/saving") }}/' + id + '/delete');
 
+                    if (response.status === 200) {
+                        this.getSavings();
+                    }
+
+                } catch (error) {
+                    console.log('ERR handleDeletePlan', error);
+                }
             },
             async handleRemovePayment(id) {
                 try {
