@@ -109,6 +109,7 @@
                         this.paybillData.living = {
                             name: response.data.name,
                             id: response.data.id,
+                            target: response.data.target, 
                         };
                     }
 
@@ -139,8 +140,12 @@
             },
             async doHandlePayment(id) {
                 const file = document.getElementById('addPaymentUpload').files[0];
+
                 let formData = new FormData();
-                formData.append('file', file);
+
+                if (file) {
+                    formData.append('file', file);
+                }
 
                 const {amount, datetime, saving_id} = this.paybillData.form;
 
@@ -196,7 +201,9 @@
             });
         },
         computed: {
-
+            paybillTotalSpent() {
+                return this.paybillData.items.reduce((acc, item) => acc + item.amount, 0);
+            }
         }
     });
 </script>

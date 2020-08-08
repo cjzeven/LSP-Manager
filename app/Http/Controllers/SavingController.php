@@ -106,16 +106,18 @@ class SavingController extends Controller
     public function apiCreateItem(Request $request, $id)
     {
         $items = SavingItem::create($request->all());
-        $upload = (new HomeController())->apiUploadFile($request, 'saving');
 
-        if ($upload->original) {
-            if ($upload->original['status'] === 1) {
-                $items->receipt_photo = $upload->original['image'];
-                $items->save();
+        if ($request->file('file')) {
+            $upload = (new HomeController())->apiUploadFile($request, 'saving');
+            if ($upload->original) {
+                if ($upload->original['status'] === 1) {
+                    $items->receipt_photo = $upload->original['image'];
+                    $items->save();
+                }
             }
         }
 
-        return response()->json($items, 200);
+        return response()->json($items, 200);   
     }
 
     public function apiDeleteItem($id)
