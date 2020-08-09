@@ -50,6 +50,11 @@
                     </div>
                 </td>
             </tr>
+            <tr v-if="savings.length <= 0">
+                <td colspan="7">
+                    <p class="text-center">No items yet.</p>
+                </td>
+            </tr>
         </tbody>
     </table>
 
@@ -195,6 +200,11 @@
                 $('#planDetailsModal').modal();
             },
             async handleDeletePlan(id) {
+
+                if (!confirm('Are you sure to DELETE this plan?')) {
+                    return false;
+                }
+
                 try {
                     const response = await axios.get('{{ url("api/saving") }}/' + id + '/delete');
 
@@ -207,6 +217,11 @@
                 }
             },
             async handleRemovePayment(id) {
+
+                if (!confirm('Are you sure to DELETE this payment?')) {
+                    return false;
+                }
+
                 try {
                     // remove payment history
                     const response = await axios.post('{{ url("api/saving/delete") }}/' + id);
