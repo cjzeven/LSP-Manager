@@ -4,7 +4,7 @@
     <div class="modal-dialog modal-lg modal-dialog-scrollable">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title" id="staticBackdropLabel"><strong>XXXXX</strong></h5>
+                <h5 class="modal-title" id="staticBackdropLabel"><strong>@{{ spentForm.name }}</strong></h5>
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                     <span aria-hidden="true">&times;</span>
                 </button>
@@ -24,23 +24,23 @@
                                         <th>Options</th>
                                     </thead>
                                     <tbody>
-                                        <tr>
-                                            <td>111</td>
-                                            <td>222</td>
-                                            <td>333</td>
+                                        <tr v-for="item in spentForm.playingItems">
+                                            <td>@{{ item.id }}</td>
+                                            <td>@{{ item.datetime }}</td>
+                                            <td>@{{ item.amount }}</td>
                                             <td>
-                                                <a target="_blank">Receipt</a>
-                                                <a>-</a>
+                                                <a :href="item.receipt_photo" target="_blank" v-if="item.receipt_photo">Receipt</a>
+                                                <a v-else>-</a>
                                             </td>
                                             <td>
                                                 <div class="form-group">
-                                                    <button class="btn btn-outline-danger btn-sm">
+                                                    <button class="btn btn-outline-danger btn-sm" @click="handleSpentDelete(item.id)">
                                                         Delete
                                                     </button>
                                                 </div>
                                             </td>
                                         </tr>
-                                        <tr>
+                                        <tr v-if="spentForm.playingItems.length <= 0">
                                             <td colspan="5">
                                                 <p class="text-center">No payments yet</p>
                                             </td>
@@ -55,8 +55,8 @@
                                 <h5>Add Payment</h5>
                                     <div class="form-group">
                                         <div class="input-group">
-                                            <input type="text" class="form-control" placeholder="IDR">
-                                            <input type="text" aria-label="Date" class="form-control" placeholder="Date" id="add-payment-date">
+                                            <input type="text" class="form-control" placeholder="IDR" v-model="spentForm.payment.amount">
+                                            <input type="text" aria-label="Date" class="form-control" placeholder="Date" id="createSpentDatepicker">
                                             <div class="input-group-append append-items">
                                                 <span class="input-group-text fileupload-container">
                                                     <input type="file" name="uploadReceipt" id="addPaymentUpload">&nbsp;&nbsp;
@@ -64,7 +64,7 @@
                                             </div>
                                         </div>
                                     </div>
-                                <button class="btn btn-danger btn-sm">Pay</button>
+                                <button class="btn btn-danger btn-sm" @click="handleSpentPay">Pay</button>
                             </div>
                         </div>
                     </div>

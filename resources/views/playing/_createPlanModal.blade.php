@@ -16,14 +16,14 @@
                         <div>
                             <h5>Name</h5>
                             <div class="form-group">
-                                <input type="text" class="form-control" placeholder="Name">
+                                <input type="text" class="form-control" placeholder="Name" v-model="createPlanForm.name">
                             </div>
                         </div>
 
                         <div>
                             <h5>Target Budget</h5>
                             <div class="form-group">
-                                <input type="text" class="form-control" placeholder="IDR">
+                                <input type="text" class="form-control" placeholder="IDR" v-model="createPlanForm.target_budget">
                             </div>
                         </div>
 
@@ -41,7 +41,7 @@
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                <button type="button" class="btn btn-primary">Create</button>
+                <button type="button" class="btn btn-primary" @click="doHandleCreatePlan">Create</button>
             </div>
         </div>
     </div>

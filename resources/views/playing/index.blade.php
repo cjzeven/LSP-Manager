@@ -35,17 +35,17 @@
                     </tr>
                 </thead>
                 <tbody>
-                    <tr>
-                        <td>1</td>
-                        <td>Hello</td>
-                        <td>300000</td>
-                        <td>200000</td>
-                        <td>150000</td>
+                    <tr v-for="item in playingData">
+                        <td>@{{ item.id }}</td>
+                        <td>@{{ item.name }}</td>
+                        <td>@{{ _format(item.target_budget) }}</td>
+                        <td>@{{ _format(calculateTotalSpent(item.items)) }}</td>
+                        <td>@{{ _format(item.target_budget - calculateTotalSpent(item.items)) }}</td>
                         <td>
                             <div class="btn-group" role="group" aria-label="Option buttons">
-                                <button type="button" class="btn btn-sm btn-danger" @click="handleSpentModal">Spent</button>
-                                <button type="button" class="btn btn-sm btn btn-outline-success" @click="handleDetailModal">Details</button>
-                                <button type="button" class="btn btn-sm btn-outline-primary" @click="handleDeletePlan">Delete</button>
+                                <button type="button" class="btn btn-sm btn-danger" @click="handleSpentModal(item.id)">Spent</button>
+                                <button type="button" class="btn btn-sm btn btn-outline-success" @click="handleDetailModal(item.di)">Details</button>
+                                <button type="button" class="btn btn-sm btn-outline-primary" @click="handleDeletePlan(item.id)">Delete</button>
                             </div>
                         </td>
                     </tr>
@@ -65,23 +65,163 @@
     new Vue({
         el: '#app',
         data: {
-
+            createPlanForm: {
+                name: '',
+                target_budget: '',
+                datetime: '',
+            },
+            spentForm: {
+                payment: {
+                    playing_id: 0,
+                    datetime: '',
+                    amount: '',
+                    receipt_photo: '',
+                },
+                playingItems: [],
+                name: '',
+            },
+            playingData: [],
         },
         methods: {
+            async getPlayingData() {
+                try {
+                    const response = await axios.get('{{ url("api/playings") }}');
+                    
+                    if (response.status === 200) {
+                        this.playingData = response.data;
+                    }
+                } catch (error) {
+                    console.log('ERR getPlayingData', error);
+                }
+            },
+            async getPlayingItemData(id) {
+                try {
+                    const response = await axios.get('{{ url("api/playing") }}/' + id);
+
+                    if (response.status === 200) {
+                        this.spentForm.playingItems = response.data.items;
+                        this.spentForm.name = response.data.name;
+                    }
+                } catch (error) {
+                    console.log('ERR getPlayingItemData');
+                }
+            },
             handleCreatePlan() {
                 $('#createPlanModal').modal();
             },
-            handleSpentModal() {
+            async doHandleCreatePlan() {
+                try {
+                    let response = await axios.post('{{ url("api/playing/create") }}', this.createPlanForm);
+
+                    if (response.status === 200) {
+                        this.getPlayingData();
+
+                        $('#createPlanModal').modal('hide');
+                    }
+                } catch (error) {
+                    console.log('ERR doHandleCreatePlan');
+                }
+            },
+            async handleSpentModal(id) {
+                this.spentForm.payment.playing_id = id;
+
+                await this.getPlayingItemData(id);
+
                 $('#spentModal').modal();
             },
-            handleDetailModal() {
+            async handleDetailModal(id) {
                 $('#planDetailsModal').modal();
             },
-            handleDeletePlan() {
-                
-            }
+            async handleDeletePlan(id) {
+
+                if (!confirm('Are you sure to DELETE?')) {
+                    return;
+                }
+
+                try {
+                    const response = await axios.get('{{ url("api/playing") }}/' + id + '/delete');
+
+                    if (response.status === 200) {
+                        this.getPlayingData(id);
+                    }
+                } catch (error) {
+                    console.log('ERR handleDeletePlan', error);
+                }
+            },
+            async handleSpentDelete(id) {
+
+                if (!confirm('Are you sure to DELETE?')) {
+                    return;
+                }
+
+                try {
+                    const response = await axios.get('{{ url("api/playing/delete") }}/' + id);
+
+                    if (response.status === 200) {
+                        this.getPlayingItemData(this.spentForm.payment.playing_id);
+                    }
+                } catch (error) {
+                    console.log('ERR handleSpentDelete', error);
+                }
+            },
+            async handleSpentPay() {
+                const file = document.getElementById('addPaymentUpload').files[0];
+
+                let formData = new FormData();
+
+                if (file) {
+                    formData.append('file', file);
+                }
+
+                const {amount, datetime, playing_id} = this.spentForm.payment;
+
+                formData.append('amount', amount);
+                formData.append('datetime', datetime);
+                formData.append('playing_id', playing_id);
+
+                try {
+                    const response = await axios.post('{{ url("api/playing") }}/' + playing_id + '/create', formData);
+
+                    if (response.status === 200) {
+                        await this.getPlayingItemData(playing_id);
+                    }
+                } catch (error) {
+                    console.log('ERR handleSpentPay', error);
+                }
+            },
+            calculateTotalSpent(item) {
+                return item.reduce((acc, item) => acc + item.amount, 0);
+            },
+            _format(value) {
+                return moneyFormatIDR(value);
+            },
         },
         mounted() {
+            this.getPlayingData();
+
+            $('#createPlanDatepicker').datepicker({
+                format: "yyyy/mm/dd",
+                autoclose: true,
+                todayHighlight: true,
+                startDate: new Date(),
+            })
+            .on('changeDate', e => {
+                const date = moment(e.date).format('YYYY/MM/DD hh:mm:ss');
+                this.createPlanForm.datetime = date;
+            });
+
+            $('#createSpentDatepicker').datepicker({
+                format: "yyyy/mm/dd",
+                autoclose: true,
+                todayHighlight: true,
+                startDate: new Date(),
+            })
+            .on('changeDate', e => {
+                const date = moment(e.date).format('YYYY/MM/DD hh:mm:ss');
+                this.spentForm.payment.datetime = date;
+            });
+        },
+        computed: {
 
         }
     });

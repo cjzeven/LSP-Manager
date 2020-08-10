@@ -36,4 +36,11 @@ Route::post('api/saving/{id}/create', 'SavingController@apiCreateItem');
 Route::post('api/saving/delete/{id}', 'SavingController@apiDeleteItem');
 Route::get('api/saving/{id}/delete', 'SavingController@apiDestroy');
 
+Route::post('api/playing/create', 'PlayingController@apiCreate');
+Route::get('api/playings', 'PlayingController@apiAll');
+Route::get('api/playing/{id}', 'PlayingController@apiFind');
+Route::post('api/playing/{id}/create', 'PlayingController@apiCreateItem');
+Route::get('api/playing/delete/{id}', 'PlayingController@apiDeleteItem');
+Route::get('api/playing/{id}/delete', 'PlayingController@apiDestroy');
+
 Route::post('api/upload/{category}', 'HomeController@apiUploadFile');
