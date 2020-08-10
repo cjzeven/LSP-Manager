@@ -13,7 +13,7 @@ class PlayingController extends Controller
      */
     public function index()
     {
-        //
+        return view('playing.index');
     }
 
     /**
