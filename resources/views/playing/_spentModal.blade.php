@@ -72,9 +72,9 @@
                 <br>
             </div>
             <div class="modal-footer">
-                <p class="inline">Target Budget: <strong>111</strong></p>|
-                <p class="inline">Total Spent: <strong>222</strong></p>|
-                <p class="inline">Budget Left: <strong>333</strong></p>
+                <p class="inline">Target Budget: <strong>@{{ _format(targetBudget) }}</strong></p>|
+                <p class="inline">Total Spent: <strong>@{{ _format(totalSpent) }}</strong></p>|
+                <p class="inline">Budget Left: <strong>@{{ _format(budgetLeft) }}</strong></p>
                 <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
             </div>
         </div>

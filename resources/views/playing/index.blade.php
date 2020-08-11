@@ -222,7 +222,17 @@
             });
         },
         computed: {
-
+            targetBudget() {
+                const id = this.spentForm.payment.playing_id;
+                const data = this.playingData.find(item => item.id === id);
+                return data ? data.target_budget : 0;
+            },
+            totalSpent() {
+                return this.spentForm.playingItems.reduce((acc, item) => acc + item.amount, 0);
+            },
+            budgetLeft() {
+                return this.targetBudget - this.totalSpent;
+            }
         }
     });
 </script>
