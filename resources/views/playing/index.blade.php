@@ -44,7 +44,6 @@
                         <td>
                             <div class="btn-group" role="group" aria-label="Option buttons">
                                 <button type="button" class="btn btn-sm btn-danger" @click="handleSpentModal(item.id)">Spent</button>
-                                <button type="button" class="btn btn-sm btn btn-outline-success" @click="handleDetailModal(item.di)">Details</button>
                                 <button type="button" class="btn btn-sm btn-outline-primary" @click="handleDeletePlan(item.id)">Delete</button>
                             </div>
                         </td>
@@ -57,7 +56,6 @@
 
     @include('playing._createPlanModal')
     @include('playing._spentModal')
-    @include('playing._planDetailsModal')
 
 </div>
 

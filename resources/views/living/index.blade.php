@@ -170,7 +170,9 @@
                 }
             },
             handleRemoveItem(id) {
-                this.createPlanForm.requiredItems = this.createPlanForm.requiredItems.filter(item => item.id != id);
+                if (confirm('Are you sure to DELETE this?')) {
+                    this.createPlanForm.requiredItems = this.createPlanForm.requiredItems.filter(item => item.id != id);
+                }
             },
             async handleCreatePlanCreate() {
                 try {
