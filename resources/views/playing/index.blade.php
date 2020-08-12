@@ -48,6 +48,11 @@
                             </div>
                         </td>
                     </tr>
+                    <tr v-if="!playingData.length">
+                        <td colspan="6">
+                            <p class="text-center">No items yet.</p>
+                        </td>
+                    </tr>
                 </tbody>
             </table>
 
