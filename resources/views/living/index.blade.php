@@ -73,9 +73,9 @@
             </tr>
         </thead>
         <tbody>
-            <tr v-if="livingData.length > 0" v-for="data in livingData">
-                <td>@{{ data.id }}</td>
-                <td>@{{ data.datetime }}</td>
+            <tr v-if="livingData.length > 0" v-for="(data, index) in livingData">
+                <td>@{{ index + 1 }}</td>
+                <td>@{{ _formatDate(data.datetime) }}</td>
                 <td>@{{ _format(data.target_budget) }}</td>
                 <td>@{{ _format(data.total_spent) }}</td>
                 <td>@{{ _format(data.target_budget - data.total_spent) }}</td>
@@ -131,6 +131,9 @@
         methods: {
             _format(value) {
                 return moneyFormatIDR(value);
+            },
+            _formatDate(date) {
+                return moment(new Date(date)).format('DD MMMM YYYY');
             },
             async getLivingData() {
                 try {

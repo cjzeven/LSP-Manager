@@ -37,8 +37,8 @@
                     </tr>
                 </thead>
                 <tbody>
-                    <tr v-for="item in playingData">
-                        <td>@{{ item.id }}</td>
+                    <tr v-for="(item, index) in playingData">
+                        <td>@{{ index + 1 }}</td>
                         <td>@{{ item.name }}</td>
                         <td>@{{ _format(item.target_budget) }}</td>
                         <td>@{{ _format(calculateTotalSpent(item.items)) }}</td>
@@ -88,6 +88,9 @@
             playingData: [],
         },
         methods: {
+            _formatDate(date) {
+                return moment(new Date(date)).format('DD MMMM YYYY');
+            },
             async getPlayingData() {
                 try {
                     const response = await axios.get('{{ url("api/playings") }}');
@@ -163,7 +166,8 @@
                     const response = await axios.get('{{ url("api/playing/delete") }}/' + id);
 
                     if (response.status === 200) {
-                        this.getPlayingItemData(this.spentForm.payment.playing_id);
+                        await this.getPlayingItemData(this.spentForm.payment.playing_id);
+                        this.getPlayingData();
                     }
                 } catch (error) {
                     console.log('ERR handleSpentDelete', error);
@@ -189,6 +193,7 @@
 
                     if (response.status === 200) {
                         await this.getPlayingItemData(playing_id);
+                        this.getPlayingData();
                     }
                 } catch (error) {
                     console.log('ERR handleSpentPay', error);

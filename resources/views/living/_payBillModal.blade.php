@@ -4,7 +4,7 @@
     <div class="modal-dialog modal-lg modal-dialog-scrollable">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title" id="staticBackdropLabel">Pay Bill: @{{ currentModalData.datetime }}</h5>
+                <h5 class="modal-title" id="staticBackdropLabel">Pay Bill: @{{ _formatDate(currentModalData.datetime) }}</h5>
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                     <span aria-hidden="true">&times;</span>
                 </button>

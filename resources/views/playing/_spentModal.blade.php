@@ -26,7 +26,7 @@
                                     <tbody>
                                         <tr v-for="item in spentForm.playingItems">
                                             <td>@{{ item.id }}</td>
-                                            <td>@{{ item.datetime }}</td>
+                                            <td>@{{ _formatDate(item.datetime) }}</td>
                                             <td>@{{ item.amount }}</td>
                                             <td>
                                                 <a :href="item.receipt_photo" target="_blank" v-if="item.receipt_photo">Receipt</a>

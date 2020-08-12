@@ -36,8 +36,8 @@
             </tr>
         </thead>
         <tbody>
-            <tr v-for="item in savings">
-                <td>@{{ item.id }}</td>
+            <tr v-for="(item, index) in savings">
+                <td>@{{ index + 1 }}</td>
                 <td>@{{ item.type == 1 ? 'Bank' : 'Reksadana' }}</td>
                 <td>@{{ item.name }}</td>
                 <td>@{{ item.years }}</td>
@@ -99,6 +99,9 @@
         methods: {
             _format(value) {
                 return moneyFormatIDR(value);
+            },
+            _formatDate(date) {
+                return moment(new Date(date)).format('DD MMMM YYYY');
             },
             async getSavings() {
                 try {

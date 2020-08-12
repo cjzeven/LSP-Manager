@@ -4,7 +4,7 @@
     <div class="modal-dialog modal-lg modal-dialog-scrollable">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title" id="staticBackdropLabel">Details: @{{ detailsData.datetime }}</h5>
+                <h5 class="modal-title" id="staticBackdropLabel">Details: @{{ _formatDate(detailsData.datetime) }}</h5>
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                     <span aria-hidden="true">&times;</span>
                 </button>
@@ -42,7 +42,7 @@
                                 </div>
                             </li>
                         </ul>
-                        <ul>
+                        <ul v-else>
                             <li>No items yet</li>
                         </ul>
                     </div>

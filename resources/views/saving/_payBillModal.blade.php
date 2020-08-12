@@ -26,7 +26,7 @@
                                     <tbody>
                                         <tr v-for="item in paybillData.items">
                                             <td>@{{ item.id }}</td>
-                                            <td>@{{ item.datetime }}</td>
+                                            <td>@{{ _formatDate(item.datetime) }}</td>
                                             <td>@{{ _format(item.amount) }}</td>
                                             <td>
                                                 <a v-if="item.receipt_photo" :href="item.receipt_photo" target="_blank">Receipt</a>
