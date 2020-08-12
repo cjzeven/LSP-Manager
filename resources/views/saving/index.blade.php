@@ -22,43 +22,45 @@
 
     <br>
 
-    <table class="table">
-        <thead>
-            <tr>
-                <th>No</th>
-                <th>Type</th>
-                <th>Name</th>
-                <th>Year</th>
-                <th>Target</th>
-                <th>Total Saving</th>
-                <th>Target Left</th>
-                <th>Options</th>
-            </tr>
-        </thead>
-        <tbody>
-            <tr v-for="(item, index) in savings">
-                <td>@{{ index + 1 }}</td>
-                <td>@{{ item.type == 1 ? 'Bank' : 'Reksadana' }}</td>
-                <td>@{{ item.name }}</td>
-                <td>@{{ item.years }}</td>
-                <td>@{{ _format(item.target) }}</td>
-                <td>@{{ _format(item.total) }}</td>
-                <td>@{{ _format(item.targetLeft) }}</td>
-                <td>
-                    <div class="btn-group" role="group" aria-label="Basic example">
-                        <button type="button" class="btn btn-sm btn-danger" @click="handlePayBill(item.id)">Pay Bill</button>
-                        <button type="button" class="btn btn-sm btn btn-outline-success" @click="handlePlanDetails(item.id)">Details</button>
-                        <button type="button" class="btn btn-sm btn-outline-primary" @click="handleDeletePlan(item.id)">Delete</button>
-                    </div>
-                </td>
-            </tr>
-            <tr v-if="savings.length <= 0">
-                <td colspan="7">
-                    <p class="text-center">No items yet.</p>
-                </td>
-            </tr>
-        </tbody>
-    </table>
+    <div class="table-responsive">
+        <table class="table table-striped table-hover">
+            <thead>
+                <tr>
+                    <th>No</th>
+                    <th>Type</th>
+                    <th>Name</th>
+                    <th>Year</th>
+                    <th>Target</th>
+                    <th>Total Saving</th>
+                    <th>Target Left</th>
+                    <th>Options</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr v-for="(item, index) in savings">
+                    <td>@{{ index + 1 }}</td>
+                    <td>@{{ item.type == 1 ? 'Bank' : 'Reksadana' }}</td>
+                    <td>@{{ item.name }}</td>
+                    <td>@{{ item.years }}</td>
+                    <td>@{{ _format(item.target) }}</td>
+                    <td>@{{ _format(item.total) }}</td>
+                    <td>@{{ _format(item.targetLeft) }}</td>
+                    <td>
+                        <div class="btn-group" role="group" aria-label="Basic example">
+                            <button type="button" class="btn btn-sm btn-danger" @click="handlePayBill(item.id)">Pay Bill</button>
+                            <button type="button" class="btn btn-sm btn btn-outline-success" @click="handlePlanDetails(item.id)">Details</button>
+                            <button type="button" class="btn btn-sm btn-outline-primary" @click="handleDeletePlan(item.id)">Delete</button>
+                        </div>
+                    </td>
+                </tr>
+                <tr v-if="savings.length <= 0">
+                    <td colspan="7">
+                        <p class="text-center">No items yet.</p>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
 
     @include('saving._createPlanModal')
     @include('saving._payBillModal')

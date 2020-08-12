@@ -25,38 +25,40 @@
 
             <br>
 
-            <table class="table">
-                <thead>
-                    <tr>
-                        <th>No</th>
-                        <th>Name</th>
-                        <th>Budget</th>
-                        <th>Total Spent</th>
-                        <th>Budget Left</th>
-                        <th>Options</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr v-for="(item, index) in playingData">
-                        <td>@{{ index + 1 }}</td>
-                        <td>@{{ item.name }}</td>
-                        <td>@{{ _format(item.target_budget) }}</td>
-                        <td>@{{ _format(calculateTotalSpent(item.items)) }}</td>
-                        <td>@{{ _format(item.target_budget - calculateTotalSpent(item.items)) }}</td>
-                        <td>
-                            <div class="btn-group" role="group" aria-label="Option buttons">
-                                <button type="button" class="btn btn-sm btn-danger" @click="handleSpentModal(item.id)">Spent</button>
-                                <button type="button" class="btn btn-sm btn-outline-primary" @click="handleDeletePlan(item.id)">Delete</button>
-                            </div>
-                        </td>
-                    </tr>
-                    <tr v-if="!playingData.length">
-                        <td colspan="6">
-                            <p class="text-center">No items yet.</p>
-                        </td>
-                    </tr>
-                </tbody>
-            </table>
+            <div class="table-responsive">
+                <table class="table table-striped table-hover">
+                    <thead>
+                        <tr>
+                            <th>No</th>
+                            <th>Name</th>
+                            <th>Budget</th>
+                            <th>Total Spent</th>
+                            <th>Budget Left</th>
+                            <th>Options</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr v-for="(item, index) in playingData">
+                            <td>@{{ index + 1 }}</td>
+                            <td>@{{ item.name }}</td>
+                            <td>@{{ _format(item.target_budget) }}</td>
+                            <td>@{{ _format(calculateTotalSpent(item.items)) }}</td>
+                            <td>@{{ _format(item.target_budget - calculateTotalSpent(item.items)) }}</td>
+                            <td>
+                                <div class="btn-group" role="group" aria-label="Option buttons">
+                                    <button type="button" class="btn btn-sm btn-danger" @click="handleSpentModal(item.id)">Spent</button>
+                                    <button type="button" class="btn btn-sm btn-outline-primary" @click="handleDeletePlan(item.id)">Delete</button>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr v-if="!playingData.length">
+                            <td colspan="6">
+                                <p class="text-center">No items yet.</p>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
 
         </div>
     </div>

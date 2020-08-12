@@ -61,37 +61,40 @@
 
     <br>
 
-    <table class="table">
-        <thead>
-            <tr>
-                <th>No</th>
-                <th>Date Time</th>
-                <th>Target Budget</th>
-                <th>Total Spent</th>
-                <th>Budget Left</th>
-                <th>Options</th>
-            </tr>
-        </thead>
-        <tbody>
-            <tr v-if="livingData.length > 0" v-for="(data, index) in livingData">
-                <td>@{{ index + 1 }}</td>
-                <td>@{{ _formatDate(data.datetime) }}</td>
-                <td>@{{ _format(data.target_budget) }}</td>
-                <td>@{{ _format(data.total_spent) }}</td>
-                <td>@{{ _format(data.target_budget - data.total_spent) }}</td>
-                <td>
-                    <div class="btn-group" role="group" aria-label="Basic example">
-                        <button type="button" class="btn btn-sm btn-danger" @click="handlePayBill(data.id)">Pay Bill</button>
-                        <button type="button" class="btn btn-sm btn btn-outline-success" @click="handlePlanDetails(data.id)">Details</button>
-                        <button type="button" class="btn btn-sm btn-outline-primary" @click="handleDeletePlan(data.id)">Delete</button>
-                    </div>
-                </td>
-            </tr>
-            <tr v-if="livingData.length <= 0">
-                <td colspan="6"><p class="text-center">No items yet.</p></td>
-            </tr>
-        </tbody>
-    </table>
+    <div class="table-responsive">
+        <table class="table table-striped table-hover">
+            <thead>
+                <tr>
+                    <th>No</th>
+                    <th>Date Time</th>
+                    <th>Target Budget</th>
+                    <th>Total Spent</th>
+                    <th>Budget Left</th>
+                    <th>Options</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr v-if="livingData.length > 0" v-for="(data, index) in livingData">
+                    <td>@{{ index + 1 }}</td>
+                    <td>@{{ _formatDate(data.datetime) }}</td>
+                    <td>@{{ _format(data.target_budget) }}</td>
+                    <td>@{{ _format(data.total_spent) }}</td>
+                    <td>@{{ _format(data.target_budget - data.total_spent) }}</td>
+                    <td>
+                        <div class="btn-group" role="group" aria-label="Basic example">
+                            <button type="button" class="btn btn-sm btn-danger" @click="handlePayBill(data.id)">Pay Bill</button>
+                            <button type="button" class="btn btn-sm btn btn-outline-success" @click="handlePlanDetails(data.id)">Details</button>
+                            <button type="button" class="btn btn-sm btn-outline-primary" @click="handleDeletePlan(data.id)">Delete</button>
+                        </div>
+                    </td>
+                </tr>
+                <tr v-if="livingData.length <= 0">
+                    <td colspan="6"><p class="text-center">No items yet.</p></td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
 
     @include('living._createPlanModal')
 
