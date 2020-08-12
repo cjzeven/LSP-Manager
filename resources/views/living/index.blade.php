@@ -66,7 +66,7 @@
             <thead>
                 <tr>
                     <th>No</th>
-                    <th>Date Time</th>
+                    <th>Date</th>
                     <th>Target Budget</th>
                     <th>Total Spent</th>
                     <th>Budget Left</th>

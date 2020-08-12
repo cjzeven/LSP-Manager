@@ -30,6 +30,7 @@
                     <thead>
                         <tr>
                             <th>No</th>
+                            <th>Date</th>
                             <th>Name</th>
                             <th>Budget</th>
                             <th>Total Spent</th>
@@ -40,6 +41,7 @@
                     <tbody>
                         <tr v-for="(item, index) in playingData">
                             <td>@{{ index + 1 }}</td>
+                            <td>@{{ _formatDate(item.datetime) }}</td>
                             <td>@{{ item.name }}</td>
                             <td>@{{ _format(item.target_budget) }}</td>
                             <td>@{{ _format(calculateTotalSpent(item.items)) }}</td>
