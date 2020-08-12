@@ -170,7 +170,7 @@
                     const response = await axios.get('{{ url("api/playing/delete") }}/' + id);
 
                     if (response.status === 200) {
-                        await this.getPlayingItemData(this.spentForm.payment.playing_id);
+                        this.getPlayingItemData(this.spentForm.payment.playing_id);
                         this.getPlayingData();
                     }
                 } catch (error) {
@@ -196,7 +196,7 @@
                     const response = await axios.post('{{ url("api/playing") }}/' + playing_id + '/create', formData);
 
                     if (response.status === 200) {
-                        await this.getPlayingItemData(playing_id);
+                        this.getPlayingItemData(playing_id);
                         this.getPlayingData();
                     }
                 } catch (error) {

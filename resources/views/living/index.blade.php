@@ -191,7 +191,7 @@
                     });
 
                     if (create.status === 200) {
-                        await this.getLivingData();
+                        this.getLivingData();
                         $('#createPlanModal').modal('hide');
                     }
                 } catch (error) {
@@ -209,7 +209,7 @@
                     });
                     
                     if (result.status === 200) {
-                        await this.getLivingData();
+                        this.getLivingData();
                         $('#createPlanModal').modal('hide');
                     }
                 } catch (error) {
@@ -455,7 +455,7 @@
         },
         async mounted() {
 
-            await this.getLivingData();
+            this.getLivingData();
 
             $('#createPlanDateTime').datepicker({
                 format: "yyyy/mm/dd",
