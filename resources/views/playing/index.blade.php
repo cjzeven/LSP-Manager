@@ -1,5 +1,7 @@
 @extends('layouts.app')
 
+@section('title', 'Playing Plan')
+
 @section('content')
 
 <style>
