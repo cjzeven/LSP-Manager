@@ -92,7 +92,7 @@ class SavingController extends Controller
 
     public function apiAll()
     {
-        $savings = Saving::with('items')->orderBy('target', 'desc')->get();
+        $savings = Saving::with('items')->orderBy('target', 'desc')->paginate(6);
         return response()->json($savings, 200);
     }
 

@@ -63,14 +63,26 @@
 
     <div class="table-responsive">
         <b-table
-            id="my-table"
-            :items="items"
+            :id="tableName"
+            :items="getLivingData"
             :per-page="perPage"
             :current-page="currentPage"
             :fields="fields"
             :striped="true"
             :hover="true"
+            :busy.sync="isBusy"
         >
+            <template v-slot:table-busy>
+                <div class="text-center text-danger my-2">
+                    <b-spinner class="align-middle" variant="secondary" small></b-spinner>
+                    <strong class="text-secondary" small>Loading...</strong>
+                </div>
+            </template>
+
+            <template v-slot:cell(id)="row">
+                @{{ parseInt(from) + parseInt(row.index) }}
+            </template>
+
             <template v-slot:cell(options)="row">
                 <b-button-group size="sm">
                     <b-button @click="handlePayBill(row.item.id)" variant="danger">
@@ -93,11 +105,11 @@
             v-model="currentPage"
             :total-rows="rows"
             :per-page="perPage"
-            aria-controls="my-table"
+            :aria-controls="tableName"
             size="sm"
         >
         </b-pagination>
-        <p class="mt-3">Page: @{{ currentPage }} of @{{ rows }}</p>
+        <p class="mt-3">Page: @{{ currentPage }} of @{{ totalPages }}</p>
     </div>
 
     <div class="table-responsive d-none">
@@ -170,7 +182,8 @@
             monthToDuplicate: [],
             selectedMonthToDuplicate: 0,
             // Pagination
-            perPage: 5,
+            tableName: 'my-table',
+            perPage: 0,
             currentPage: 1,
             items: [],
             fields: [
@@ -180,7 +193,11 @@
                 { key: 'total_spent', label: 'Total Spent' },
                 { key: 'budget_left', label: 'Budget Left' },
                 { key: 'options', label: 'Options' },
-            ]
+            ],
+            rows: 0,
+            totalPages: 0,
+            isBusy: false,
+            from: 0,
             // End pagination
         },
         methods: {
@@ -190,15 +207,23 @@
             _formatDate(date) {
                 return moment(new Date(date)).format('DD MMMM YYYY');
             },
-            async getLivingData() {
+            async getLivingData(ctx, callback) {
+                this.isBusy = true;
+
+                const params = '?page=' + ctx.currentPage;
+
                 try {
-                    const response = (await axios.get('api/living/all'));
+                    const response = await axios.get('api/living/all' + params);
 
                     if (response.status === 200) {
-                        this.livingData = response.data;
-                        this.items = response.data;
 
-                        this.items = response.data.map(item => {
+                        this.rows = response.data.total;
+                        this.perPage = response.data.per_page;
+                        this.currentPage = response.data.current_page;
+                        this.totalPages = response.data.last_page;
+                        this.from = response.data.from;
+
+                        return response.data.data.map(item => {
                             return {
                                 id: item.id,
                                 date: this._formatDate(item.datetime),
@@ -206,10 +231,14 @@
                                 budget_left: this._format(item.target_budget - item.total_spent),
                                 target_budget: this._format(item.target_budget),
                             };  
-                        })
+                        });
+
+                        this.isBusy = false;
+
                     }
                 } catch (error) {
                     console.log('ERR getLivingData', error);
+                    this.isBusy = false;
                 }
             },
             async handleCreatePlan() {
@@ -254,7 +283,7 @@
                     });
 
                     if (create.status === 200) {
-                        this.getLivingData();
+                        this.$root.$emit('bv::refresh::table', this.tableName);
                         $('#createPlanModal').modal('hide');
                     }
                 } catch (error) {
@@ -272,7 +301,7 @@
                     });
                     
                     if (result.status === 200) {
-                        this.getLivingData();
+                        this.$root.$emit('bv::refresh::table', this.tableName);
                         $('#createPlanModal').modal('hide');
                     }
                 } catch (error) {
@@ -500,6 +529,7 @@
 
                         if (item.status === 200) {
                             this.livingData = this.livingData.filter(item => item.id != id);
+                            this.$root.$emit('bv::refresh::table', this.tableName);
                         }
                     } catch (error) {
                         console.log('ERR handleDeletePlan', error);
@@ -518,8 +548,6 @@
         },
         async mounted() {
 
-            this.getLivingData();
-
             $('#createPlanDateTime').datepicker({
                 format: "yyyy/mm/dd",
                 autoclose: true,
@@ -537,6 +565,10 @@
                 todayHighlight: true,
                 startDate: new Date(),
             });
+
+            $('#payBillModal').on('hidden.bs.modal', (e) => {
+                this.$root.$emit('bv::refresh::table', this.tableName);
+            })
         },
         updated() {
 
@@ -554,9 +586,6 @@
             calculateBudgetLeft() {
                 return this.currentModalData.targetBudget - this.calculateTotalSpent;
             },
-            rows() {
-                return this.items.length
-            }
         },
         watch: {
             // Watch target budget from updating

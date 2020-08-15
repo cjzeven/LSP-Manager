@@ -86,7 +86,7 @@ class LivingController extends Controller
 
     public function apiAll()
     {
-        $livings = Living::all();
+        $livings = Living::paginate(5);
         return response()->json($livings, 200);
     }
 

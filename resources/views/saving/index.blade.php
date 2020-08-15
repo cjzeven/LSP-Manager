@@ -23,43 +23,58 @@
     <br>
 
     <div class="table-responsive">
-        <table class="table table-striped table-hover">
-            <thead>
-                <tr>
-                    <th>No</th>
-                    <th>Type</th>
-                    <th>Name</th>
-                    <th>Year</th>
-                    <th>Target</th>
-                    <th>Total Saving</th>
-                    <th>Target Left</th>
-                    <th>Options</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr v-for="(item, index) in savings">
-                    <td>@{{ index + 1 }}</td>
-                    <td>@{{ item.type == 1 ? 'Bank' : 'Reksadana' }}</td>
-                    <td>@{{ item.name }}</td>
-                    <td>@{{ item.years }}</td>
-                    <td>@{{ _format(item.target) }}</td>
-                    <td>@{{ _format(item.total) }}</td>
-                    <td>@{{ _format(item.targetLeft) }}</td>
-                    <td>
-                        <div class="btn-group" role="group" aria-label="Basic example">
-                            <button type="button" class="btn btn-sm btn-danger" @click="handlePayBill(item.id)">Pay Bill</button>
-                            <button type="button" class="btn btn-sm btn btn-outline-success" @click="handlePlanDetails(item.id)">Details</button>
-                            <button type="button" class="btn btn-sm btn-outline-primary" @click="handleDeletePlan(item.id)">Delete</button>
-                        </div>
-                    </td>
-                </tr>
-                <tr v-if="savings.length <= 0">
-                    <td colspan="7">
-                        <p class="text-center">No items yet.</p>
-                    </td>
-                </tr>
-            </tbody>
-        </table>
+        <b-table
+            :id="tableName"
+            :items="getSavings"
+            :per-page="perPage"
+            :current-page="currentPage"
+            :fields="fields"
+            :striped="true"
+            :hover="true"
+            :busy.sync="isBusy"
+        >
+            <template v-slot:cell(id)="row">
+                @{{ parseInt(from) + parseInt(row.index) }}
+            </template>
+
+            <template v-slot:cell(type)="row">
+                @{{ row.item.type == 1 ? 'Bank' : 'Reksadana' }}
+            </template>
+
+            <template v-slot:table-busy>
+                <div class="text-center text-danger my-2">
+                    <b-spinner class="align-middle" variant="secondary" small></b-spinner>
+                    <strong class="text-secondary" small>Loading...</strong>
+                </div>
+            </template>
+
+            <template v-slot:cell(options)="row">
+                <b-button-group size="sm">
+                    <b-button @click="handlePayBill(row.item.id)" variant="danger">
+                        Pay Bill
+                    </b-button>
+                    <b-button @click="handlePlanDetails(row.item.id)" variant="outline-success">
+                        Details
+                    </b-button>
+                    <b-button @click="handleDeletePlan(row.item.id)" variant="outline-info">
+                        Delete
+                    </b-button>
+                </b-button-group>
+            </template>
+        </b-table>
+    </div>
+
+    
+    <div class="d-flex justify-content-between align-items-center">
+        <b-pagination
+            v-model="currentPage"
+            :total-rows="rows"
+            :per-page="perPage"
+            :aria-controls="tableName"
+            size="sm"
+        >
+        </b-pagination>
+        <p class="mt-3">Page: @{{ currentPage }} of @{{ totalPages }}</p>
     </div>
 
     @include('saving._createPlanModal')
@@ -88,7 +103,6 @@
                 living: {},
                 items: [],
             },
-            savings: [],
             detailsData: {
                 id: 0,
                 name: '',
@@ -97,6 +111,26 @@
                 totalTarget: 0,
                 totalLeft: 0,
             },
+            // Pagination
+            tableName: 'my-table',
+            perPage: 0,
+            currentPage: 1,
+            items: [],
+            fields: [
+                { key: 'id', label: 'No' },
+                { key: 'type', label: 'Type' },
+                { key: 'name', label: 'Name' },
+                { key: 'year', label: 'Year' },
+                { key: 'target_budget', label: 'Target' },
+                { key: 'total_saving', label: 'Total Saving' },
+                { key: 'target_left', label: 'Target Left' },
+                { key: 'options', label: 'Options' },
+            ],
+            rows: 0,
+            totalPages: 0,
+            isBusy: false,
+            from: 0,
+            // End pagination
         },
         methods: {
             _format(value) {
@@ -105,19 +139,40 @@
             _formatDate(date) {
                 return moment(new Date(date)).format('DD MMMM YYYY');
             },
-            async getSavings() {
+            async getSavings(ctx, callback) {
+                this.isBusy = true;
+
+                const params = '?page=' + ctx.currentPage;
+
                 try {
-                    const response = await axios.get('{{ url("api/savings") }}');
+                    const response = await axios.get('{{ url("api/savings") }}' + params);
 
                     if (response.status === 200) {
-                        this.savings = response.data.map(saving => {
-                            saving.total = saving.items.reduce((acc, item) => acc + item.amount, 0);
-                            saving.targetLeft = saving.target - saving.total;
-                            return saving;
-                        })
+
+                        this.rows = response.data.total;
+                        this.perPage = response.data.per_page;
+                        this.currentPage = response.data.current_page;
+                        this.totalPages = response.data.last_page;
+                        this.from = response.data.from;
+
+                        return response.data.data.map(saving => {
+                            const totalSaving = saving.items.reduce((acc, item) => acc + item.amount, 0);
+                            return {
+                                id: saving.id,
+                                name: saving.name,
+                                type: saving.type,
+                                year: saving.years,
+                                target_budget: saving.target,
+                                total_saving: totalSaving,
+                                target_left: saving.target - totalSaving,
+                            };
+                        });
+
+                        this.isBusy = false;
                     }
                 } catch (error) {
                     console.log('ERR getSavings', error);
+                    this.isBusy = false;
                 }
             },
             async getSavingItems(id) {
@@ -145,7 +200,7 @@
                     const response = await axios.post('{{ url("api/saving/create") }}', this.createPlanForm);
 
                     if (response.status === 200) {
-                        this.getSavings();
+                        this.$root.$emit('bv::refresh::table', this.tableName);
 
                         $('#createPlanModal').modal('hide');
                     }
@@ -177,8 +232,8 @@
                     const response = await axios.post('{{ url("api/saving") }}/' + id + '/create', formData);
 
                     if (response.status === 200) {
-                        this.getSavings();
                         this.getSavingItems(id);
+                        this.$root.$emit('bv::refresh::table', this.tableName);
                     }
                 } catch (error) {
                     
@@ -216,7 +271,7 @@
                     const response = await axios.get('{{ url("api/saving") }}/' + id + '/delete');
 
                     if (response.status === 200) {
-                        this.getSavings();
+                        this.$root.$emit('bv::refresh::table', this.tableName);
                     }
 
                 } catch (error) {
@@ -234,8 +289,8 @@
                     const response = await axios.post('{{ url("api/saving/delete") }}/' + id);
                     
                     if (response.status === 200) {
-                        this.getSavings();
                         this.getSavingItems(this.paybillData.form.saving_id);
+                        this.$root.$emit('bv::refresh::table', this.tableName);
                     }
 
                 } catch (error) {
@@ -245,7 +300,6 @@
 
         },
         mounted() {
-            this.getSavings();
 
             $('#add-payment-date').datepicker({
                 format: "yyyy/mm/dd",
@@ -261,7 +315,7 @@
         computed: {
             paybillTotalSpent() {
                 return this.paybillData.items.reduce((acc, item) => acc + item.amount, 0);
-            }
+            },
         }
     });
 </script>
