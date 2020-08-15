@@ -62,6 +62,45 @@
     <br>
 
     <div class="table-responsive">
+        <b-table
+            id="my-table"
+            :items="items"
+            :per-page="perPage"
+            :current-page="currentPage"
+            :fields="fields"
+            :striped="true"
+            :hover="true"
+        >
+            <template v-slot:cell(options)="row">
+                <b-button-group size="sm">
+                    <b-button @click="handlePayBill(row.item.id)" variant="danger">
+                        Pay Bill
+                    </b-button>
+                    <b-button @click="handlePlanDetails(row.item.id)" variant="outline-success">
+                        Details
+                    </b-button>
+                    <b-button @click="handleDeletePlan(row.item.id)" variant="outline-info">
+                        Delete
+                    </b-button>
+                </b-button-group>
+            </template>
+        </b-table>
+    </div>
+
+    
+    <div class="d-flex justify-content-between align-items-center">
+        <b-pagination
+            v-model="currentPage"
+            :total-rows="rows"
+            :per-page="perPage"
+            aria-controls="my-table"
+            size="sm"
+        >
+        </b-pagination>
+        <p class="mt-3">Page: @{{ currentPage }} of @{{ rows }}</p>
+    </div>
+
+    <div class="table-responsive d-none">
         <table class="table table-striped table-hover">
             <thead>
                 <tr>
@@ -130,6 +169,19 @@
             currentModalData: {},
             monthToDuplicate: [],
             selectedMonthToDuplicate: 0,
+            // Pagination
+            perPage: 5,
+            currentPage: 1,
+            items: [],
+            fields: [
+                { key: 'id', label: 'No' },
+                { key: 'date', label: 'Date' },
+                { key: 'target_budget', label: 'Target Budget' },
+                { key: 'total_spent', label: 'Total Spent' },
+                { key: 'budget_left', label: 'Budget Left' },
+                { key: 'options', label: 'Options' },
+            ]
+            // End pagination
         },
         methods: {
             _format(value) {
@@ -144,6 +196,17 @@
 
                     if (response.status === 200) {
                         this.livingData = response.data;
+                        this.items = response.data;
+
+                        this.items = response.data.map(item => {
+                            return {
+                                id: item.id,
+                                date: this._formatDate(item.datetime),
+                                total_spent: this._format(item.total_spent),
+                                budget_left: this._format(item.target_budget - item.total_spent),
+                                target_budget: this._format(item.target_budget),
+                            };  
+                        })
                     }
                 } catch (error) {
                     console.log('ERR getLivingData', error);
@@ -490,6 +553,9 @@
             },
             calculateBudgetLeft() {
                 return this.currentModalData.targetBudget - this.calculateTotalSpent;
+            },
+            rows() {
+                return this.items.length
             }
         },
         watch: {

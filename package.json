@@ -24,6 +24,7 @@
         "vue-template-compiler": "^2.6.10"
     },
     "dependencies": {
-        "@babel/standalone": "^7.10.5"
+        "@babel/standalone": "^7.10.5",
+        "bootstrap-vue": "^2.16.0"
     }
 }

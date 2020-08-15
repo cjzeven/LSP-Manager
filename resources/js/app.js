@@ -34,6 +34,12 @@ window.Vue = require('vue');
 
 require('@babel/standalone');
 
+import { BootstrapVue, IconsPlugin } from 'bootstrap-vue';
+// Install BootstrapVue
+Vue.use(BootstrapVue)
+// Optionally install the BootstrapVue icon components plugin
+Vue.use(IconsPlugin)
+
 window.moneyFormatIDR = function(value) {
     const formatted = new Intl.NumberFormat('id-ID', {style: 'currency', currency: 'IDR'}).format(value);
     return formatted;
