@@ -162,9 +162,9 @@
                                 name: saving.name,
                                 type: saving.type,
                                 year: saving.years,
-                                target_budget: saving.target,
-                                total_saving: totalSaving,
-                                target_left: saving.target - totalSaving,
+                                target_budget: this._format(saving.target),
+                                total_saving: this._format(totalSaving),
+                                target_left: this._format(saving.target - totalSaving),
                             };
                         });
 
